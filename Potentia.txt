@@ -1,0 +1,13 @@
+Coal - inworld deposits
+Oil - inworld deposits, each chunk will have some oil in it (dependant on the amount of tiles and depth)
+Gas - from biomass, inworld deposits similar to oil
+Solar - based on weather/daynight cycle
+Wind - fluctuating
+Water - based on maxHeight
+Geothermal - based on depth and blocks surrounding the pipes
+Nuclear fusion - fuel density of fuel, how fast it burns it
+Nuclear fission - fuel
+
+Battery
+
+Wires
