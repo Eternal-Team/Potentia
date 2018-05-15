@@ -47,8 +47,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Global\PWorld.cs" />
+    <Compile Include="Items\Coal.cs" />
     <Compile Include="Potentia.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tiles\Coal.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="build.txt" />

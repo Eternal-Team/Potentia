@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Potentia.Tiles;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Terraria;
@@ -27,22 +28,39 @@ namespace Potentia.Global
 
 		public override void ModifyWorldGenTasks(List<GenPass> tasks, ref float totalWeight)
 		{
+			int ShiniesIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Shinies"));
+			if (ShiniesIndex != -1)
+			{
+				tasks.Insert(ShiniesIndex, new PassLegacy("Potentia:FossilisedFuels", progress =>
+				{
+					progress.Message = "Fossilising dinosaurs";
+
+					GenerateOilGas();
+
+					for (int k = 0; k < (int)(Main.maxTilesX * Main.maxTilesY * 3E-05); k++)
+					{
+						int x = WorldGen.genRand.Next(0, Main.maxTilesX);
+						int y = WorldGen.genRand.Next((int)WorldGen.worldSurfaceLow, Main.maxTilesY - 200);
+
+						WorldGen.TileRunner(x, y, WorldGen.genRand.Next(5, 10), WorldGen.genRand.Next(150, 200), mod.TileType<Coal>());
+					}
+				}));
+			}
+		}
+
+		public void GenerateOilGas()
+		{
 			oil = new int[Main.maxTilesX / 50, Main.maxTilesY / 50];
 			gas = new int[Main.maxTilesX / 50, Main.maxTilesY / 50];
 
-			tasks.Add(new PassLegacy("Potentia:OilGas", progress =>
+			for (int i = 0; i < oil.GetLength(0); i++)
 			{
-				progress.Message = "Fossilising dinosaurs";
-
-				for (int i = 0; i < oil.GetLength(0); i++)
+				for (int j = 0; j < oil.GetLength(1); j++)
 				{
-					for (int j = 0; j < oil.GetLength(1); j++)
-					{
-						oil[i, j] = (int)(1E6 * RandomWeighted(0.3f, 1.8f, 1f, 25));
-						gas[i, j] = (int)(1E6 * RandomWeighted(0.5f, 2.5f, 1.6f, 25));
-					}
+					oil[i, j] = (int)(1E6 * RandomWeighted(0.3f, 1.8f, 1f, 15));
+					gas[i, j] = (int)(1E6 * RandomWeighted(0.5f, 2.5f, 1.6f, 15));
 				}
-			}));
+			}
 		}
 
 		public override TagCompound Save()
