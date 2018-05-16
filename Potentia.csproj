@@ -48,9 +48,12 @@
   <ItemGroup>
     <Compile Include="Global\PWorld.cs" />
     <Compile Include="Items\Coal.cs" />
+    <Compile Include="Items\WaterPump.cs" />
     <Compile Include="Potentia.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tiles\Coal.cs" />
+    <Compile Include="TileEntities\TEWaterPump.cs" />
+    <Compile Include="Tiles\WaterPump.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="build.txt" />
@@ -61,6 +64,10 @@
       <Project>{FE14625B-5827-4C2C-B11B-DE3F22AE17B2}</Project>
       <Name>TheOneLibrary</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Items\Generators\" />
+    <Folder Include="Tiles\Generators\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

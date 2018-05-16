@@ -3,8 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartAction>Program</StartAction>
     <StartProgram>C:\Program Files %28x86%29\Steam\steamapps\common\Terraria [Modded]\Terraria.exe</StartProgram>
-    <StartArguments>
-    </StartArguments>
+    <StartArguments>-skipselect</StartArguments>
     <StartWorkingDirectory>C:\Program Files %28x86%29\Steam\steamapps\common\Terraria [Modded]</StartWorkingDirectory>
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
   </PropertyGroup>

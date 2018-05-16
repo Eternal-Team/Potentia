@@ -1,7 +1,7 @@
-﻿using Potentia.Tiles;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Potentia.Tiles;
 using Terraria;
 using Terraria.GameContent.Generation;
 using Terraria.ModLoader;

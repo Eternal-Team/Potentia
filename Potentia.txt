@@ -1,4 +1,6 @@
-Coal - inworld deposits
+---Coal---
+
+
 Oil - inworld deposits, each chunk will have some oil in it (dependant on the amount of tiles and depth)
 Gas - from biomass, inworld deposits similar to oil
 Solar - based on weather/daynight cycle
