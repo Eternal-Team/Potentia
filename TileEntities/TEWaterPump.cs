@@ -1,6 +1,6 @@
-﻿using Potentia.Tiles;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Potentia.Tiles;
 using Terraria;
 using Terraria.ID;
 using TheOneLibrary.Base;
@@ -38,6 +38,7 @@ namespace Potentia.TileEntities
 					if (Main.tile[x, y].liquidType() == Tile.Liquid_Water) pumpRate += Main.tile[x, y].liquid;
 				}
 			}
+
 			fluid.volume += Math.Min(pumpRate, GetFluidCapacity() - fluid.volume);
 		}
 

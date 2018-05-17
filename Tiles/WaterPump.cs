@@ -2,7 +2,6 @@
 using Potentia.TileEntities;
 using Terraria;
 using Terraria.DataStructures;
-using Terraria.Enums;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 using TheOneLibrary.Base;

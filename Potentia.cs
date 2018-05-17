@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Potentia.Global;
+using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
@@ -23,11 +22,18 @@ namespace Potentia
 			public const string TilePath = Path + "Tiles/";
 		}
 
-		public GUI<TestUI> ui;
+		[Null] public static Potentia Instance;
+
+		[UI("TileEntity")] public Dictionary<ModTileEntity, GUI> TEUI = new Dictionary<ModTileEntity, GUI>();
+		public LegacyGameInterfaceLayer InventoryLayer;
+		//public GUI<TestUI> ui;
 
 		public override void Load()
 		{
-			ui = Utility.SetupGUI<TestUI>();
+			Instance = this;
+
+			//ui = Utility.SetupGUI<TestUI>();
+			InventoryLayer = new LegacyGameInterfaceLayer("Potentia: Inventory", () => TEUI.Values.Draw(), InterfaceScaleType.UI);
 		}
 
 		public override void Unload()
@@ -35,19 +41,26 @@ namespace Potentia
 			Utility.UnloadNullableTypes();
 		}
 
+		public override void PreSaveAndQuit()
+		{
+			TEUI.Clear();
+		}
+
 		public override void PostUpdateInput()
 		{
-			if (Keys.X.IsKeyDown())
-			{
-				ui.@interface.IsVisible = !ui.@interface.IsVisible;
-				if (ui.@interface.IsVisible) ui.ui.Load();
-				else ui.ui.RemoveAllChildren();
-			}
+			//if (Keys.X.IsKeyDown())
+			//{
+			//	ui.@interface.IsVisible = !ui.@interface.IsVisible;
+			//	if (ui.@interface.IsVisible) ui.ui.Load();
+			//	else ui.ui.RemoveAllChildren();
+			//}
 		}
 
 		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
 		{
-			layers.Add(ui.InterfaceLayer);
+			int Hotbar = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Hotbar"));
+			if (Hotbar != -1) layers.Insert(Hotbar, InventoryLayer);
+			//layers.Add(ui.InterfaceLayer);
 		}
 	}
 
