@@ -1,5 +1,5 @@
-﻿using DawnOfIndustryPower.TileEntities.Generators;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Potentia.TileEntities.Generators;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
@@ -12,8 +12,6 @@ namespace Potentia.Tiles.Generators
 {
 	public class WindTurbine : BaseTile
 	{
-		//public override string Texture => DawnOfIndustryPower.TileTexturePath + "WindTurbine";
-
 		public override void SetDefaults()
 		{
 			Main.tileSolid[Type] = false;
@@ -40,16 +38,14 @@ namespace Potentia.Tiles.Generators
 
 		public override void RightClick(int i, int j)
 		{
-			int ID = mod.GetID<TEWindTurbine>(i, j);
-			if (ID == -1) return;
-
-			//DawnOfIndustryPower.Instance.HandleUI<WindTurbineUI>(ID);
+			TEWindTurbine panel = mod.GetTileEntity<TEWindTurbine>(i, j);
+			panel?.HandleUI();
 		}
 
 		public override void KillMultiTile(int i, int j, int frameX, int frameY)
 		{
-			int ID = mod.GetID<TEWindTurbine>(i, j);
-			//if (ID != -1) DawnOfIndustryPower.Instance.CloseUI(ID);
+			TEWindTurbine panel = mod.GetTileEntity<TEWindTurbine>(i, j);
+			panel?.CloseUI();
 
 			Item.NewItem(i * 16, j * 16, 48, 96, mod.ItemType<Items.Generators.WindTurbine>());
 			mod.GetTileEntity<TEWindTurbine>().Kill(i, j);

@@ -1,13 +1,11 @@
-﻿using DawnOfIndustryPower.TileEntities.Generators;
-using Microsoft.Xna.Framework;
-using Potentia.UI.Generators;
+﻿using Microsoft.Xna.Framework;
+using Potentia.TileEntities.Generators;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 using TheOneLibrary.Base;
-using TheOneLibrary.Base.UI;
 using TheOneLibrary.Utils;
 
 namespace Potentia.Tiles.Generators
@@ -46,27 +44,14 @@ namespace Potentia.Tiles.Generators
 
 		public override void RightClick(int i, int j)
 		{
-			int ID = mod.GetID<TESolarPanel>(i, j);
-			if (ID == -1) return;
-
-			TESolarPanel panel = (TESolarPanel)TileEntity.ByID[ID];
-			GUI<SolarPanelUI> gui = panel.gui;
-			if (!Potentia.Instance.TEUI.ContainsValue(gui))
-			{
-				gui.ui.Load();
-				Potentia.Instance.TEUI.Add(panel, gui);
-			}
-			else
-			{
-				gui.ui.Unload();
-				Potentia.Instance.TEUI.Remove(panel);
-			}
+			TESolarPanel panel = mod.GetTileEntity<TESolarPanel>(i, j);
+			panel?.HandleUI();
 		}
 
 		public override void KillMultiTile(int i, int j, int frameX, int frameY)
 		{
-			int ID = mod.GetID<TESolarPanel>(i, j);
-			if (ID != -1) Potentia.Instance.CloseUI(ID);
+			TESolarPanel panel = mod.GetTileEntity<TESolarPanel>(i, j);
+			panel?.CloseUI();
 
 			Item.NewItem(i * 16, j * 16, 48, 32, mod.ItemType<Items.Generators.SolarPanel>());
 			mod.GetTileEntity<TESolarPanel>().Kill(i, j);

@@ -1,5 +1,6 @@
-﻿using DawnOfIndustryPower.TileEntities.Generators;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Potentia.TileEntities;
+using Potentia.TileEntities.Generators;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
@@ -41,16 +42,14 @@ namespace Potentia.Tiles.Generators
 
 		public override void RightClick(int i, int j)
 		{
-			int ID = mod.GetID<TEWaterTurbine>(i, j);
-			if (ID == -1) return;
-
-			//DawnOfIndustryPower.Instance.HandleUI<WaterTurbineUI>(ID);
+			TEWaterTurbine panel = mod.GetTileEntity<TEWaterTurbine>(i, j);
+			panel?.HandleUI();
 		}
 
 		public override void KillMultiTile(int i, int j, int frameX, int frameY)
 		{
-			int ID = mod.GetID<TEWaterTurbine>(i, j);
-			//if (ID != -1) DawnOfIndustryPower.Instance.CloseUI(ID);
+			TEWaterTurbine panel = mod.GetTileEntity<TEWaterTurbine>(i, j);
+			panel?.CloseUI();
 
 			Item.NewItem(i * 16, j * 16, 48, 32, mod.ItemType<Items.Generators.WaterTurbine>());
 			mod.GetTileEntity<TEWaterTurbine>().Kill(i, j);

@@ -1,4 +1,4 @@
-﻿using DawnOfIndustryPower.TileEntities.Generators;
+﻿using Potentia.TileEntities.Generators;
 using Terraria;
 using Terraria.ModLoader;
 using TheOneLibrary.Base.UI;

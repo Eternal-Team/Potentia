@@ -1,16 +1,32 @@
 ﻿using Potentia.Tiles.Generators;
+using Potentia.UI.Generators;
 using Terraria;
 using Terraria.ID;
+using Terraria.UI;
 using TheOneLibrary.Base;
+using TheOneLibrary.Base.UI;
 using TheOneLibrary.Energy.Energy;
 using TheOneLibrary.Utils;
 
-namespace DawnOfIndustryPower.TileEntities.Generators
+namespace Potentia.TileEntities.Generators
 {
 	public class TEWaterTurbine : BaseTE, IEnergyProvider
 	{
 		[Save, Sync] public EnergyStorage energy = new EnergyStorage(250000, 10000);
-		
+
+		public TEWaterTurbine()
+		{
+			if (Main.netMode != NetmodeID.Server)
+			{
+				WaterTurbineUI ui = new WaterTurbineUI();
+				ui.SetTileEntity(this);
+				UserInterface userInterface = new UserInterface();
+				ui.Activate();
+				userInterface.SetState(ui);
+				gui = new GUI<WaterTurbineUI>(ui, userInterface);
+			}
+		}
+
 		public override bool ValidTile(Tile tile) => tile.type == mod.TileType<WaterTurbine>() && tile.TopLeft();
 
 		public override int Hook_AfterPlacement(int i, int j, int type, int style, int direction)
