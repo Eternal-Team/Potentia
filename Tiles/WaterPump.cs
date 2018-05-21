@@ -30,8 +30,8 @@ namespace Potentia.Tiles
 
 		public override void KillMultiTile(int i, int j, int frameX, int frameY)
 		{
-			int ID = mod.GetID<TEWaterPump>(i, j);
-			//if (ID != -1) DawnOfIndustryPower.Instance.CloseUI(ID);
+			TEWaterPump pump = mod.GetTileEntity<TEWaterPump>(i, j);
+			pump.CloseUI();
 
 			Item.NewItem(i * 16, j * 16, 80, 48, mod.ItemType<Items.WaterPump>());
 			mod.GetTileEntity<TEWaterPump>().Kill(i, j);

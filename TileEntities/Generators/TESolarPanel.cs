@@ -3,7 +3,6 @@ using Potentia.Tiles.Generators;
 using Potentia.UI.Generators;
 using Terraria;
 using Terraria.ID;
-using Terraria.UI;
 using TheOneLibrary.Base;
 using TheOneLibrary.Base.UI;
 using TheOneLibrary.Energy.Energy;
@@ -13,20 +12,13 @@ namespace Potentia.TileEntities.Generators
 {
 	public class TESolarPanel : BaseTE, IEnergyProvider
 	{
+		public GUI<SolarPanelUI> gui;
 		[Save, Sync] public EnergyStorage energy = new EnergyStorage(50000, 2500);
 		public float efficiency;
 
 		public TESolarPanel()
 		{
-			if (Main.netMode != NetmodeID.Server)
-			{
-				SolarPanelUI ui = new SolarPanelUI();
-				ui.SetTileEntity(this);
-				UserInterface userInterface = new UserInterface();
-				ui.Activate();
-				userInterface.SetState(ui);
-				gui = new GUI<SolarPanelUI>(ui, userInterface);
-			}
+			if (Main.netMode != NetmodeID.Server) gui = Utility.SetupGUI<SolarPanelUI>(this);
 		}
 
 		public override bool ValidTile(Tile tile) => tile.type == mod.TileType<SolarPanel>() && tile.TopLeft();

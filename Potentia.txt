@@ -10,6 +10,6 @@ Geothermal - based on depth and blocks surrounding the pipes
 Nuclear fusion - fuel density of fuel, how fast it burns it
 Nuclear fission - fuel
 
-Battery
+Battery - modular
 
-Wires
+Wires - rework ModLayer

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Potentia.TileEntities;
 using Potentia.TileEntities.Generators;
 using Terraria;
 using Terraria.DataStructures;

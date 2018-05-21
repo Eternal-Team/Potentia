@@ -2,7 +2,6 @@
 using Potentia.UI.Generators;
 using Terraria;
 using Terraria.ID;
-using Terraria.UI;
 using TheOneLibrary.Base;
 using TheOneLibrary.Base.UI;
 using TheOneLibrary.Energy.Energy;
@@ -12,19 +11,12 @@ namespace Potentia.TileEntities.Generators
 {
 	public class TEWaterTurbine : BaseTE, IEnergyProvider
 	{
+		public GUI<WaterTurbineUI> gui;
 		[Save, Sync] public EnergyStorage energy = new EnergyStorage(250000, 10000);
 
 		public TEWaterTurbine()
 		{
-			if (Main.netMode != NetmodeID.Server)
-			{
-				WaterTurbineUI ui = new WaterTurbineUI();
-				ui.SetTileEntity(this);
-				UserInterface userInterface = new UserInterface();
-				ui.Activate();
-				userInterface.SetState(ui);
-				gui = new GUI<WaterTurbineUI>(ui, userInterface);
-			}
+			if (Main.netMode != NetmodeID.Server) gui = Utility.SetupGUI<WaterTurbineUI>(this);
 		}
 
 		public override bool ValidTile(Tile tile) => tile.type == mod.TileType<WaterTurbine>() && tile.TopLeft();
