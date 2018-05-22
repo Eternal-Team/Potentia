@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Potentia.Cable;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using Terraria.UI;
 using TheOneLibrary.Base;
 using TheOneLibrary.Base.UI;
@@ -10,25 +13,23 @@ namespace Potentia
 {
 	public class Potentia : Mod
 	{
-		[Texture]
 		public struct Textures
 		{
 			public const string Path = "Potentia/Textures/";
 			public const string TilePath = Path + "Tiles/";
+
+			[Texture(Path + "CableGrid/BasicWire")] public static Texture2D cableTexture;
 		}
 
-		[Null] public static Potentia Instance;
+		public static Potentia Instance;
 
 		public GUIs UIs = new GUIs("Vanilla: Hotbar");
 
 		public override void Load()
 		{
 			Instance = this;
-		}
-
-		public override void Unload()
-		{
-			Utility.UnloadNullableTypes();
+			Utility.LoadTextures();
+			TagSerializer.AddSerializer(new CableSerializer());
 		}
 
 		public override void PreSaveAndQuit()

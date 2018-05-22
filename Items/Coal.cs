@@ -1,5 +1,5 @@
-﻿using TheOneLibrary.Base.Items;
-using TheOneLibrary.Utils;
+﻿using Terraria.ID;
+using TheOneLibrary.Base.Items;
 
 namespace Potentia.Items
 {
@@ -20,7 +20,7 @@ namespace Potentia.Items
 			item.autoReuse = true;
 			item.useAnimation = 15;
 			item.useTime = 10;
-			item.useStyle = UseStyleID.SwingThrow;
+			item.useStyle = ItemUseStyleID.SwingThrow;
 			item.consumable = true;
 			item.createTile = mod.TileType<Tiles.Coal>();
 		}

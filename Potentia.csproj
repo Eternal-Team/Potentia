@@ -46,6 +46,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cable\BasicCable.cs" />
+    <Compile Include="Cable\CableLayer.cs" />
+    <Compile Include="Cable\FacingIndexedArray.cs" />
+    <Compile Include="Cable\Cable.cs" />
+    <Compile Include="Cable\CableGrid.cs" />
+    <Compile Include="Cable\CableSerializer.cs" />
     <Compile Include="Global\PWorld.cs" />
     <Compile Include="Items\Coal.cs" />
     <Compile Include="Items\Generators\WindTurbine.cs" />

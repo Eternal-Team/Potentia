@@ -1,29 +1,35 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Xna.Framework.Graphics;
+using Potentia.Cable;
 using Potentia.Tiles;
 using Terraria;
 using Terraria.GameContent.Generation;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.World.Generation;
-using TheOneLibrary.Base;
 using TheOneLibrary.Utils;
 
 namespace Potentia.Global
 {
 	public class PWorld : ModWorld
 	{
-		[Null] public static PWorld Instance;
+		public static PWorld Instance;
 
 		public int[,] oil;
 		public int[,] gas;
+
+		public CableLayer layer;
 
 		public float RandomWeighted(float min, float max, float cap, int percent) => Main.rand.Next(0, 101) > percent ? Main.rand.NextFloat(min, cap) : Main.rand.NextFloat(cap, max);
 
 		public override void Initialize()
 		{
 			Instance = this;
+
+			layer = new CableLayer();
 		}
 
 		public override void ModifyWorldGenTasks(List<GenPass> tasks, ref float totalWeight)
@@ -63,16 +69,29 @@ namespace Potentia.Global
 			}
 		}
 
-		public override TagCompound Save()
+		public override void PreUpdate()
 		{
-			TagCompound tag = new TagCompound();
-			tag["Width"] = oil.GetLength(0);
-			tag["Height"] = oil.GetLength(1);
-			tag["DataOil"] = oil.Cast<int>().ToList();
-			tag["DataGas"] = gas.Cast<int>().ToList();
-
-			return tag;
+			layer.Update();
 		}
+
+		public override void PostDrawTiles()
+		{
+			RasterizerState rasterizer = Main.gameMenu || Math.Abs(Main.LocalPlayer.gravDir - 1.0) < 0.1 ? RasterizerState.CullCounterClockwise : RasterizerState.CullClockwise;
+			Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+			layer.Draw(Main.spriteBatch);
+
+			Main.spriteBatch.End();
+		}
+
+		public override TagCompound Save() => new TagCompound
+		{
+			["Width"] = oil.GetLength(0),
+			["Height"] = oil.GetLength(1),
+			["DataOil"] = oil.Cast<int>().ToList(),
+			["DataGas"] = gas.Cast<int>().ToList(),
+			["Layer"] = layer.Save()
+		};
 
 		public override void Load(TagCompound tag)
 		{
@@ -81,6 +100,8 @@ namespace Potentia.Global
 
 			oil = tag.GetList<int>("DataOil").To2DArray(width, height);
 			gas = tag.GetList<int>("DataGas").To2DArray(width, height);
+
+			layer.Load(tag.GetList<TagCompound>("Layer").ToList());
 		}
 
 		public override void NetSend(BinaryWriter writer) => TagIO.Write(Save(), writer);
