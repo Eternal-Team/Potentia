@@ -19,6 +19,7 @@ namespace Potentia
 			public const string TilePath = Path + "Tiles/";
 
 			[Texture(Path + "CableGrid/BasicWire")] public static Texture2D cableTexture;
+			[Texture(Path + "CableGrid/Connections")] public static Texture2D cableIOTexture;
 		}
 
 		public static Potentia Instance;

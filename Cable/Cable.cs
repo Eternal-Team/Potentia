@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.ModLoader;
+using TheOneLibrary.Energy.Energy;
 using TheOneLibrary.Layer.Layer;
 using TheOneLibrary.Utils;
 using static TheOneLibrary.Base.Facing;
@@ -31,7 +33,6 @@ namespace Potentia.Cable
 
 		public Point16 position;
 		public string Name;
-		public int type; // just keep Name
 		public short frameX;
 		public short frameY;
 		public long share;
@@ -43,11 +44,9 @@ namespace Potentia.Cable
 
 		public void SetDefaults(int type)
 		{
-			this.type = type;
-			Item item = new Item();
-			item.SetDefaults(type);
-			Name = item.modItem.GetType().Name;
-			maxIO = ((BasicCable)item.modItem).maxIO;
+			ModItem modItem = ItemLoader.GetItem(type);
+			Name = modItem.Name;
+			maxIO = ((BasicCable)modItem).maxIO;
 		}
 
 		public void Frame()
@@ -57,10 +56,10 @@ namespace Potentia.Cable
 			frameX = 0;
 			frameY = 0;
 
-			if (wires.ContainsKey(position.X - 1, position.Y) && wires[position.X - 1, position.Y].type == type && connections[Left]) frameX += 18;
-			if (wires.ContainsKey(position.X + 1, position.Y) && wires[position.X + 1, position.Y].type == type && connections[Right]) frameX += 36;
-			if (wires.ContainsKey(position.X, position.Y - 1) && wires[position.X, position.Y - 1].type == type && connections[Up]) frameY += 18;
-			if (wires.ContainsKey(position.X, position.Y + 1) && wires[position.X, position.Y + 1].type == type && connections[Down]) frameY += 36;
+			if (wires.ContainsKey(position.X - 1, position.Y) && wires[position.X - 1, position.Y].Name == Name && connections[Left]) frameX += 18;
+			if (wires.ContainsKey(position.X + 1, position.Y) && wires[position.X + 1, position.Y].Name == Name && connections[Right]) frameX += 36;
+			if (wires.ContainsKey(position.X, position.Y - 1) && wires[position.X, position.Y - 1].Name == Name && connections[Up]) frameY += 18;
+			if (wires.ContainsKey(position.X, position.Y + 1) && wires[position.X, position.Y + 1].Name == Name && connections[Down]) frameY += 36;
 		}
 
 		public void Merge()
@@ -85,30 +84,13 @@ namespace Potentia.Cable
 
 		public override void Draw(SpriteBatch spriteBatch)
 		{
-			Vector2 position = -Main.screenPosition + new Vector2(this.position.X, this.position.Y) * 16;
-			spriteBatch.Draw(Potentia.Textures.cableTexture, position, new Rectangle(frameX, frameY, 16, 16), Color.White, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+			Vector2 position = -Main.screenPosition + this.position.ToVector2() * 16;
+			Point16 pos = Utility.TileEntityTopLeft(this.position.X, this.position.Y);
+			Color color = Lighting.GetColor(pos.X, pos.Y);
+			spriteBatch.Draw(Potentia.Textures.cableTexture, position, new Rectangle(frameX, frameY, 16, 16), color, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 
-			//Vector2 tePosVec = (position + Main.screenPosition) / 16;
-			//Point16 tePos = TheOneLibrary.Utils.Utility.TileEntityTopLeft((int)tePosVec.X, (int)tePosVec.Y);
-			//TileEntity tileEntity = TileEntity.ByPosition.ContainsKey(tePos) ? TileEntity.ByPosition[tePos] : null;
-			//if (tileEntity != null && (tileEntity is IEnergyReceiver || tileEntity is IEnergyProvider))
-			//{
-			//	switch (IO)
-			//	{
-			//		case Connection.In:
-			//			Main.spriteBatch.Draw(DawnOfIndustryCore.inTexture, position + new Vector2(4), Color.White);
-			//			break;
-			//		case Connection.Out:
-			//			Main.spriteBatch.Draw(DawnOfIndustryCore.outTexture, position + new Vector2(4), Color.White);
-			//			break;
-			//		case Connection.Both:
-			//			Main.spriteBatch.Draw(DawnOfIndustryCore.bothTexture, position + new Vector2(4), Color.White);
-			//			break;
-			//		case Connection.Blocked:
-			//			Main.spriteBatch.Draw(DawnOfIndustryCore.blockedTexture, position + new Vector2(4), Color.White);
-			//			break;
-			//	}
-			//}
+			TileEntity te = TileEntity.ByPosition.ContainsKey(pos) ? TileEntity.ByPosition[pos] : null;
+			if (te != null && (te is IEnergyReceiver || te is IEnergyProvider)) spriteBatch.Draw(Potentia.Textures.cableIOTexture, position + new Vector2(4), new Rectangle((int)IO * 8, 0, 8, 8), Color.White);
 		}
 	}
 }

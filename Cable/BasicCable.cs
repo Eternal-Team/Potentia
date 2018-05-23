@@ -1,4 +1,5 @@
-﻿using Potentia.Global;
+﻿using Microsoft.Xna.Framework;
+using Potentia.Global;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -24,20 +25,25 @@ namespace Potentia.Cable
 			item.maxStack = 999;
 			item.rare = 0;
 			item.useStyle = ItemUseStyleID.SwingThrow;
-			item.useTime = 15;
-			item.useAnimation = 15;
+			item.useTime = 10;
+			item.useAnimation = 10;
+			item.consumable = true;
+			item.useTurn = true;
+			item.autoReuse = true;
 		}
 
 		public override bool AltFunctionUse(Player player) => true;
 
-		public override bool UseItem(Player player)
+		public override bool ConsumeItem(Player player)
 		{
 			Point16 mouse = Utility.MouseToWorldPoint;
 
 			if (player.altFunctionUse == 2) PWorld.Instance.layer.Remove(mouse, player);
-			else PWorld.Instance.layer.Place(mouse, player, item.type);
+			else return PWorld.Instance.layer.Place(mouse, player, item.type);
 
-			return true;
+			return false;
 		}
+
+		public override bool UseItem(Player player) => Vector2.Distance(Main.MouseWorld, player.Center) < 160;
 	}
 }
