@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Potentia.Cable;
 using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 using Terraria.UI;
 using TheOneLibrary.Base;
 using TheOneLibrary.Base.UI;
@@ -30,7 +28,6 @@ namespace Potentia
 		{
 			Instance = this;
 			Utility.LoadTextures();
-			TagSerializer.AddSerializer(new CableSerializer());
 		}
 
 		public override void PreSaveAndQuit()

@@ -1,7 +1,9 @@
-﻿using TheOneLibrary.Base.Items;
+﻿using TheOneLibrary.Base;
+using TheOneLibrary.Base.Items;
 
 namespace Potentia.Items.Generators
 {
+	[EnergyTile]
 	public class SolarPanel : BaseItem
 	{
 		public override void SetStaticDefaults()

@@ -9,7 +9,8 @@ Water - based on maxHeight
 Geothermal - based on depth and blocks surrounding the pipes
 Nuclear fusion - fuel density of fuel, how fast it burns it
 Nuclear fission - fuel
+lightning rod
 
 Battery - modular
 
-Wires - rework ModLayer
+Wires

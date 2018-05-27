@@ -8,16 +8,17 @@ namespace Potentia.Cable
 		public List<Cable> tiles = new List<Cable>();
 		public EnergyStorage energy = new EnergyStorage();
 
-		public long GetCapacitySharePerNode() => energy.GetCapacity() / tiles.Count;
-
-		public long GetEnergySharePerNode() => energy.GetEnergy() / tiles.Count;
+		public long GetEnergySharePerNode
+		{
+			get { return energy.GetEnergy() / tiles.Count; }
+		}
 
 		public void AddTile(Cable tile)
 		{
 			if (!tiles.Contains(tile))
 			{
 				energy.AddCapacity(tile.maxIO * 2);
-				energy.ModifyEnergyStored(tile.grid.GetEnergySharePerNode());
+				energy.ModifyEnergyStored(tile.grid.GetEnergySharePerNode);
 				tile.grid = this;
 				tiles.Add(tile);
 			}
@@ -35,7 +36,7 @@ namespace Potentia.Cable
 				CableGrid newGrid = new CableGrid();
 				newGrid.energy.SetMaxTransfer(tiles[i].maxIO);
 				newGrid.energy.SetCapacity(tiles[i].maxIO * 2);
-				newGrid.energy.ModifyEnergyStored(GetEnergySharePerNode());
+				newGrid.energy.ModifyEnergyStored(GetEnergySharePerNode);
 				newGrid.tiles.Add(tiles[i]);
 				tiles[i].grid = newGrid;
 			}

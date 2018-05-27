@@ -1,7 +1,9 @@
-﻿using TheOneLibrary.Base.Items;
+﻿using TheOneLibrary.Base;
+using TheOneLibrary.Base.Items;
 
 namespace Potentia.Items
 {
+	[EnergyTile]
 	public class WaterPump : BaseItem
 	{
 		public override void SetStaticDefaults()

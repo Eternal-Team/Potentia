@@ -1,22 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using Potentia.Global;
+using System.Collections.Generic;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
+using Terraria.ModLoader;
 using TheOneLibrary.Base.Items;
-using TheOneLibrary.Utils;
 
-namespace Potentia.Cable
+namespace Potentia.Items.Cables
 {
-	public class BasicCable : BaseItem
+	public abstract class BaseCable : BaseItem
 	{
-		public int maxIO = 1000;
-
-		public override void SetStaticDefaults()
-		{
-			DisplayName.SetDefault("Basic Wire");
-			Tooltip.SetDefault("Transfers electricity\nMax IO: 1000W");
-		}
+		public virtual int MaxIO => 0;
 
 		public override void SetDefaults()
 		{
@@ -32,14 +26,17 @@ namespace Potentia.Cable
 			item.autoReuse = true;
 		}
 
+		public override void ModifyTooltips(List<TooltipLine> tooltips)
+		{
+			tooltips.Add(new TooltipLine(mod, "Potentia:TransferRate", $"Transfers electricity at {MaxIO} W"));
+		}
+
 		public override bool AltFunctionUse(Player player) => true;
 
 		public override bool ConsumeItem(Player player)
 		{
-			Point16 mouse = Utility.MouseToWorldPoint;
-
-			if (player.altFunctionUse == 2) PWorld.Instance.layer.Remove(mouse, player);
-			else return PWorld.Instance.layer.Place(mouse, player, item.type);
+			if (player.altFunctionUse == 2) PWorld.Instance.layer.Remove(player);
+			else return PWorld.Instance.layer.Place(player, Name);
 
 			return false;
 		}

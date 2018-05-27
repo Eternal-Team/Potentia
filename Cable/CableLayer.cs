@@ -1,34 +1,28 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Potentia.Items.Cables;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader.IO;
+using TheOneLibrary.Base;
 using TheOneLibrary.Energy.Energy;
-using TheOneLibrary.Layer.Layer;
+using TheOneLibrary.Layer;
 using TheOneLibrary.Utils;
-using static TheOneLibrary.Base.Facing;
 
 namespace Potentia.Cable
 {
 	public class CableLayer : ModLayer<Cable>
 	{
-		public override string Texture => TheOneLibrary.TheOneLibrary.Textures.Placeholder;
-
-		public CableLayer()
-		{
-			DisplayName = Potentia.Instance.CreateTranslation("smh");
-			DisplayName.SetDefault("Cable");
-		}
-
 		public override void Draw(SpriteBatch spriteBatch)
 		{
-			if (!(Main.LocalPlayer.GetHeldItem().modItem is BasicCable) /*||Main.LocalPlayer.GetHeldItem()*/) return;
+			if (Main.LocalPlayer.GetHeldItem().modItem == null) return;
+			if (!(Main.LocalPlayer.GetHeldItem().modItem is BaseCable) && !Main.LocalPlayer.GetHeldItem().modItem.GetType().HasAttribute<EnergyTileAttribute>()) return;
 
-			Point16 mouse = Utility.MouseToWorldPoint;
-			if (Main.LocalPlayer.GetHeldItem().modItem is BasicCable && !elements.ContainsKey(mouse) && Vector2.Distance(mouse.ToVector2() * 16, Main.LocalPlayer.Center) < 160) DrawPreview(Main.spriteBatch, mouse, Main.LocalPlayer.GetHeldItem().type);
+			DrawPreview(Main.spriteBatch, Main.LocalPlayer.GetHeldItem().modItem.Name);
 
-			Vector2 zero = new Vector2(Main.offScreenRange, Main.offScreenRange);
+			Vector2 zero = new Vector2(Main.offScreenRange);
 			if (Main.drawToScreen) zero = Vector2.Zero;
 
 			int startX = (int)((Main.screenPosition.X - zero.X) / 16f);
@@ -45,81 +39,108 @@ namespace Potentia.Cable
 			{
 				for (int j = startY; j < endY; j++)
 				{
-					if (elements.ContainsKey(i, j))
+					if (ContainsKey(i, j))
 					{
-						elements[i, j].Draw(spriteBatch);
+						this[i, j].Draw(spriteBatch);
 					}
 				}
 			}
 		}
 
-		// ugh, oh
-
-		public void DrawPreview(SpriteBatch spriteBatch, Point16 mouse, int type)
+		public void DrawPreview(SpriteBatch spriteBatch, string name)
 		{
-			int frameX = 0;
-			int frameY = 0;
+			Point16 mouse = new Point16(Player.tileTargetX, Player.tileTargetY);
+			if (!(!ContainsKey(mouse) && Main.LocalPlayer.GetHeldItem().modItem is BaseCable && Vector2.Distance(mouse.ToVector2() * 16, Main.LocalPlayer.Center) < 160)) return;
 
-			if (elements.ContainsKey(mouse.X - 1, mouse.Y) && elements[mouse.X - 1, mouse.Y].Name==Name&& elements[mouse.X - 1, mouse.Y].connections[Left]) frameX += 18;
-			if (elements.ContainsKey(mouse.X + 1, mouse.Y) && elements[mouse.X + 1, mouse.Y].Name==Name&& elements[mouse.X + 1, mouse.Y].connections[Right]) frameX += 36;
-			if (elements.ContainsKey(mouse.X, mouse.Y - 1) && elements[mouse.X, mouse.Y - 1].Name==Name&& elements[mouse.X, mouse.Y - 1].connections[Up]) frameY += 18;
-			if (elements.ContainsKey(mouse.X, mouse.Y + 1) && elements[mouse.X, mouse.Y + 1].Name==Name&& elements[mouse.X, mouse.Y + 1].connections[Down]) frameY += 36;
+			Point16 frame = Cable.sides.Select(x => x + mouse).Select((x, i) => ContainsKey(x) && this[x].name == name && this[x].connections[i] ? Cable.frameOffset[i] : Point16.Zero).Aggregate((x, y) => x + y);
 
-			spriteBatch.Draw(Potentia.Textures.cableTexture, mouse.ToVector2() * 16 - Main.screenPosition, new Rectangle(frameX, frameY, 16, 16), Color.White * 0.5f, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+			spriteBatch.Draw(Potentia.Textures.cableTexture, mouse.ToVector2() * 16 - Main.screenPosition, new Rectangle(frame.X, frame.Y, 16, 16), Color.White * 0.5f, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 
-			foreach (Point16 side in Cable.sides)
+			foreach (Point16 point in Cable.sides.Select(x => x + mouse).Where(ContainsKey))
 			{
-				if (elements.ContainsKey(mouse + side))
-				{
-					int otherFrameX = 0;
-					int otherFrameY = 0;
+				Point16 frameOther = Cable.sides.Select((x, i) => x + point == mouse && this[point].connections[i.Counterpart()] ? Cable.frameOffset[i] : Point16.Zero).Aggregate((x, y) => x + y);
 
-					if (mouse.X + 1 == mouse.X + side.X && elements[mouse.X + side.X, mouse.Y + side.Y].Name==Name && elements[mouse.X + side.X, mouse.Y + side.Y].connections[Left]) otherFrameX += 18;
-					if (mouse.X - 1 == mouse.X + side.X && elements[mouse.X + side.X, mouse.Y + side.Y].Name==Name && elements[mouse.X + side.X, mouse.Y + side.Y].connections[Right]) otherFrameX += 36;
-					if (mouse.Y + 1 == mouse.Y + side.Y && elements[mouse.X + side.X, mouse.Y + side.Y].Name==Name && elements[mouse.X + side.X, mouse.Y + side.Y].connections[Up]) otherFrameY += 18;
-					if (mouse.Y - 1 == mouse.Y + side.Y && elements[mouse.X + side.X, mouse.Y + side.Y].Name == Name && elements[mouse.X + side.X, mouse.Y + side.Y].connections[Down]) otherFrameY += 36;
+				spriteBatch.Draw(Potentia.Textures.cableTexture, point.ToVector2() * 16 - Main.screenPosition, new Rectangle(frameOther.X, frameOther.Y, 16, 16), Color.White * 0.5f, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
+			}
+		}
 
-					spriteBatch.Draw(Potentia.Textures.cableTexture, (mouse + side).ToVector2() * 16 - Main.screenPosition, new Rectangle(otherFrameX, otherFrameY, 16, 16), Color.White * 0.5f, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
-				}
+		public override bool Place(Player player, string name)
+		{
+			Point16 mouse = new Point16(Player.tileTargetX, Player.tileTargetY);
+			if (ContainsKey(mouse)) return false;
+
+			Cable cable = new Cable();
+			cable.SetDefaults(name);
+			cable.position = mouse;
+			cable.layer = this;
+			cable.grid = new CableGrid
+			{
+				energy = new EnergyStorage(cable.maxIO * 2, cable.maxIO),
+				tiles = new List<Cable> { cable }
+			};
+			Add(mouse, cable);
+
+			cable.Merge();
+			cable.Frame();
+
+			foreach (Point16 point in Cable.sides.Select(x => x + mouse).Where(ContainsKey))
+			{
+				Cable merge = this[point];
+				if (merge.name == name) merge.Frame();
+			}
+
+			return true;
+		}
+
+		public override void Remove(Player player)
+		{
+			Point16 mouse = new Point16(Player.tileTargetX, Player.tileTargetY);
+			if (!ContainsKey(mouse)) return;
+
+			Cable cable = this[mouse];
+
+			cable.grid.tiles.Remove(cable);
+			cable.grid.ReformGrid();
+			Remove(mouse);
+
+			player.PutItemInInventory(Potentia.Instance.ItemType(cable.name));
+
+			foreach (Point16 point in Cable.sides.Select(x => x + mouse).Where(ContainsKey)) this[point].Frame();
+		}
+
+		public override void Modify(Player player)
+		{
+			Point16 mouse = new Point16(Player.tileTargetX, Player.tileTargetY);
+			if (ContainsKey(mouse)) this[mouse].Modify();
+		}
+
+		public override void Info(Player player)
+		{
+			Point16 mouse = new Point16(Player.tileTargetX, Player.tileTargetY);
+			if (ContainsKey(mouse))
+			{
+				Cable cable = this[mouse];
+
+				Main.NewText("Tiles: " + cable.grid.tiles.Count);
+				Main.NewText("Current capacity: " + cable.grid.energy.GetCapacity());
+				Main.NewText("Current IO: " + cable.grid.energy.GetMaxReceive() + "/" + cable.grid.energy.GetMaxExtract());
+				Main.NewText("Current energy: " + cable.grid.energy.GetEnergy());
 			}
 		}
 
 		public override void Update()
 		{
-			foreach (Cable wire in elements.Values)
-			{
-				Point16 check = Utility.TileEntityTopLeft(wire.position.X, wire.position.Y);
-
-				if (TileEntity.ByPosition.ContainsKey(check))
-				{
-					CableGrid grid = wire.grid;
-					TileEntity te = TileEntity.ByPosition[check];
-
-					if ((wire.IO == Connection.In || wire.IO == Connection.Both) && te is IEnergyProvider)
-					{
-						IEnergyProvider provider = (IEnergyProvider)te;
-						provider.GetEnergyStorage().ModifyEnergyStored(-grid.energy.ReceiveEnergy(Utility.Min(grid.energy.GetMaxReceive(), Utility.Min(grid.energy.GetCapacity() - grid.energy.GetEnergy(), provider.GetEnergyStorage().GetEnergy()))));
-
-						// remove cables which are on a IEnergyStorage after you extract from it?
-					}
-
-					if ((wire.IO == Connection.Out || wire.IO == Connection.Both) && te is IEnergyReceiver)
-					{
-						IEnergyReceiver receiver = (IEnergyReceiver)te;
-						receiver.GetEnergyStorage().ModifyEnergyStored(grid.energy.ExtractEnergy(Utility.Min(grid.energy.GetMaxExtract(), Utility.Min(grid.energy.GetEnergy(), receiver.GetCapacity() - receiver.GetEnergy()))));
-					}
-				}
-			}
+			foreach (Cable cable in Values) cable.Update();
 		}
 
 		public override List<TagCompound> Save()
 		{
 			List<TagCompound> tags = new List<TagCompound>();
-			foreach (KeyValuePair<Point16, Cable> pair in elements)
+			foreach (KeyValuePair<Point16, Cable> pair in this)
 			{
 				TagCompound tag = new TagCompound();
 				tag["Key"] = pair.Key;
-				tag["Value"] = pair.Value;
+				tag["Value"] = pair.Value.SaveAtt();
 				tags.Add(tag);
 			}
 
@@ -128,158 +149,21 @@ namespace Potentia.Cable
 
 		public override void Load(List<TagCompound> tags)
 		{
-			foreach (TagCompound tag in tags) elements.internalDict.Add(tag.Get<Point16>("Key"), tag.Get<Cable>("Value"));
+			foreach (TagCompound tag in tags) Add(tag.Get<Point16>("Key"), (Cable)new Cable().LoadAtt(tag.GetCompound("Value")));
 
-			foreach (Cable wire in elements.Values)
+			foreach (Cable cable in Values)
 			{
 				CableGrid grid = new CableGrid();
-				grid.energy.SetCapacity(wire.maxIO * 2);
-				grid.energy.SetMaxTransfer(wire.maxIO);
-				grid.tiles.Add(wire);
-				grid.energy.ModifyEnergyStored(wire.share);
-				wire.layer = this;
-				wire.share = 0;
-				wire.grid = grid;
+				grid.energy.SetCapacity(cable.maxIO * 2);
+				grid.energy.SetMaxTransfer(cable.maxIO);
+				grid.tiles.Add(cable);
+				grid.energy.ModifyEnergyStored(cable.share);
+				cable.layer = this;
+				cable.share = 0;
+				cable.grid = grid;
 			}
 
-			foreach (Cable wire in elements.Values) wire.Merge();
-		}
-
-		public override bool Place(Point16 mouse, Player player, int type)
-		{
-			if (elements == null || elements.ContainsKey(mouse)) return false;
-
-			// Creates a wire and places it in grid
-			Cable wire = new Cable();
-			wire.SetDefaults(type);
-			wire.position = mouse;
-			wire.layer = this;
-			elements.Add(mouse, wire);
-
-			// Creates a grid and set base values
-			CableGrid grid = new CableGrid();
-			grid.energy.SetMaxTransfer(wire.maxIO);
-			grid.energy.SetCapacity(wire.maxIO * 2);
-			grid.tiles.Add(wire);
-			wire.grid = grid;
-
-			// Merges and frames the wire
-			wire.Merge();
-			wire.Frame();
-
-			// Frames all surrounding wires
-			foreach (Point16 add in Cable.sides)
-			{
-				if (elements.ContainsKey(mouse.X + add.X, mouse.Y + add.Y))
-				{
-					Cable merge = elements[mouse + add];
-					if (merge.Name == Name) merge.Frame();
-				}
-			}
-
-			return true;
-		}
-
-		public override void Remove(Point16 mouse, Player player)
-		{
-			if (elements != null && elements.ContainsKey(mouse))
-			{
-				Cable cable = elements[mouse];
-
-				cable.grid.tiles.Remove(cable);
-				elements.Remove(mouse);
-
-				cable.grid.ReformGrid();
-
-				player.PutItemInInventory(Potentia.Instance.ItemType(cable.Name));
-
-				foreach (Point16 check in Cable.sides)
-					if (elements.ContainsKey(mouse + check))
-						elements[mouse + check].Frame();
-			}
-		}
-
-		public override void Modify(Point16 mouse)
-		{
-			Cable wire = elements[mouse];
-
-			int x = (int)Main.MouseWorld.X - mouse.X * 16;
-			int y = (int)Main.MouseWorld.Y - mouse.Y * 16;
-
-			Rectangle io = new Rectangle(4, 4, 8, 8);
-			if (!io.Contains(x, y))
-			{
-				if (Utility.PointInTriangle(new Point(x, y), new Point(0, 0), new Point(8, 8), new Point(0, 16)))
-				{
-					wire.connections[Left] = !wire.connections[Left];
-					wire.Frame();
-
-					if (!wire.connections[Left]) wire.grid.ReformGrid();
-
-					if (elements.ContainsKey(mouse.X - 1, mouse.Y))
-					{
-						Cable secCable = elements[mouse.X - 1, mouse.Y];
-						secCable.connections[Right] = !secCable.connections[Right];
-						if (wire.connections[Left]) wire.grid.MergeGrids(secCable.grid);
-						secCable.Frame();
-					}
-				}
-				else if (Utility.PointInTriangle(new Point(x, y), new Point(16, 0), new Point(16, 16), new Point(8, 8)))
-				{
-					wire.connections[Right] = !wire.connections[Right];
-					wire.Frame();
-
-					if (!wire.connections[Right]) wire.grid.ReformGrid();
-
-					if (elements.ContainsKey(mouse.X + 1, mouse.Y))
-					{
-						Cable secCable = elements[mouse.X + 1, mouse.Y];
-						secCable.connections[Left] = !secCable.connections[Left];
-						if (wire.connections[Right]) wire.grid.MergeGrids(secCable.grid);
-						secCable.Frame();
-					}
-				}
-				else if (Utility.PointInTriangle(new Point(x, y), new Point(0, 0), new Point(16, 0), new Point(8, 8)))
-				{
-					wire.connections[Up] = !wire.connections[Up];
-					wire.Frame();
-
-					if (!wire.connections[Up]) wire.grid.ReformGrid();
-
-					if (elements.ContainsKey(mouse.X, mouse.Y - 1))
-					{
-						Cable secCable = elements[mouse.X, mouse.Y - 1];
-						secCable.connections[Down] = !secCable.connections[Down];
-						if (wire.connections[Up]) wire.grid.MergeGrids(secCable.grid);
-						secCable.Frame();
-					}
-				}
-				else if (Utility.PointInTriangle(new Point(x, y), new Point(0, 16), new Point(8, 8), new Point(16, 16)))
-				{
-					wire.connections[Down] = !wire.connections[Down];
-					wire.Frame();
-
-					if (!wire.connections[Down]) wire.grid.ReformGrid();
-
-					if (elements.ContainsKey(mouse.X, mouse.Y + 1))
-					{
-						Cable secCable = elements[mouse.X, mouse.Y + 1];
-						secCable.connections[Up] = !secCable.connections[Up];
-						if (wire.connections[Down]) wire.grid.MergeGrids(secCable.grid);
-						secCable.Frame();
-					}
-				}
-			}
-		}
-
-		public override void Info(Point16 mouse)
-		{
-			Cable wire = elements[mouse];
-
-			Main.NewText("Tiles: " + wire.grid.tiles.Count);
-			Main.NewText("Current capacity: " + wire.grid.energy.GetCapacity());
-			Main.NewText("Current IO: " + wire.grid.energy.GetMaxReceive() + "/" + wire.grid.energy.GetMaxExtract());
-			Main.NewText("Current energy: " + wire.grid.energy.GetEnergy());
+			foreach (Cable cable in Values) cable.Merge();
 		}
 	}
 }
