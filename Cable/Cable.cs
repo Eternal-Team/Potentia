@@ -66,7 +66,7 @@ namespace Potentia.Cable
 
 		public void Frame()
 		{
-			frame = sides.Select(x => x + position).Select((x, i) => layer.ContainsKey(x) && layer[x].name == name && connections[i] &&layer[x].connections[i.Counterpart()]? frameOffset[i] : Point16.Zero).Aggregate((x, y) => x + y);
+			frame = sides.Select(x => x + position).Select((x, i) => layer.ContainsKey(x) && layer[x].name == name && connections[i] && layer[x].connections[i.Counterpart()] ? frameOffset[i] : Point16.Zero).Aggregate((x, y) => x + y);
 		}
 
 		public void Modify()
@@ -82,7 +82,6 @@ namespace Potentia.Cable
 					if (point.InTriangle(connectionTriangles[i]))
 					{
 						connections[i] = !connections[i];
-						Frame();
 
 						if (!connections[i]) grid.ReformGrid();
 
@@ -94,12 +93,24 @@ namespace Potentia.Cable
 							if (connections[i]) grid.MergeGrids(secCable.grid);
 							secCable.Frame();
 						}
+						Frame();
 					}
 				}
 			}
 			else IO = IO.NextEnum();
 		}
 
+		public void Remove()
+		{
+			grid.tiles.Remove(this);
+			grid.ReformGrid();
+			layer.Remove(position);
+
+			Item.NewItem(position.ToVector2() * 16, new Vector2(16), Potentia.Instance.ItemType(name));
+
+			foreach (Point16 point in sides.Select(x => x + position).Where(x => layer.ContainsKey(x))) layer[point].Frame();
+		}
+		
 		public void Merge()
 		{
 			List<Point16> list = sides.Select(x => x + position).ToList();

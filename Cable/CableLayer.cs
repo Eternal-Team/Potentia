@@ -35,30 +35,22 @@ namespace Potentia.Cable
 			if (startY < 4) startY = 4;
 			if (endY > Main.maxTilesY - 4) endY = Main.maxTilesY - 4;
 
-			for (int i = startX; i < endX; i++)
-			{
-				for (int j = startY; j < endY; j++)
-				{
-					if (ContainsKey(i, j))
-					{
-						this[i, j].Draw(spriteBatch);
-					}
-				}
-			}
+			foreach (KeyValuePair<Point16, Cable> keyValuePair in this.Where(x => x.Key.X > startX && x.Key.X < endX && x.Key.Y > startY && x.Key.Y < endY)) keyValuePair.Value.Draw(spriteBatch);
 		}
 
 		public void DrawPreview(SpriteBatch spriteBatch, string name)
 		{
 			Point16 mouse = new Point16(Player.tileTargetX, Player.tileTargetY);
+
 			if (!(!ContainsKey(mouse) && Main.LocalPlayer.GetHeldItem().modItem is BaseCable && Vector2.Distance(mouse.ToVector2() * 16, Main.LocalPlayer.Center) < 160)) return;
 
-			Point16 frame = Cable.sides.Select(x => x + mouse).Select((x, i) => ContainsKey(x) && this[x].name == name && this[x].connections[i] ? Cable.frameOffset[i] : Point16.Zero).Aggregate((x, y) => x + y);
+			Point16 frame = Cable.sides.Select(x => x + mouse).Select((x, i) => ContainsKey(x) && this[x].name == name && this[x].connections[i.Counterpart()] ? Cable.frameOffset[i] : Point16.Zero).Aggregate((x, y) => x + y);
 
 			spriteBatch.Draw(Potentia.Textures.cableTexture, mouse.ToVector2() * 16 - Main.screenPosition, new Rectangle(frame.X, frame.Y, 16, 16), Color.White * 0.5f, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 
 			foreach (Point16 point in Cable.sides.Select(x => x + mouse).Where(ContainsKey))
 			{
-				Point16 frameOther = Cable.sides.Select((x, i) => x + point == mouse && this[point].connections[i.Counterpart()] ? Cable.frameOffset[i] : Point16.Zero).Aggregate((x, y) => x + y);
+				Point16 frameOther = Cable.sides.Select((x, i) => x + point == mouse && this[point].connections[i] ? Cable.frameOffset[i] : Point16.Zero).Aggregate((x, y) => x + y);
 
 				spriteBatch.Draw(Potentia.Textures.cableTexture, point.ToVector2() * 16 - Main.screenPosition, new Rectangle(frameOther.X, frameOther.Y, 16, 16), Color.White * 0.5f, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 			}
@@ -95,17 +87,7 @@ namespace Potentia.Cable
 		public override void Remove(Player player)
 		{
 			Point16 mouse = new Point16(Player.tileTargetX, Player.tileTargetY);
-			if (!ContainsKey(mouse)) return;
-
-			Cable cable = this[mouse];
-
-			cable.grid.tiles.Remove(cable);
-			cable.grid.ReformGrid();
-			Remove(mouse);
-
-			player.PutItemInInventory(Potentia.Instance.ItemType(cable.name));
-
-			foreach (Point16 point in Cable.sides.Select(x => x + mouse).Where(ContainsKey)) this[point].Frame();
+			if (ContainsKey(mouse)) this[mouse].Remove();
 		}
 
 		public override void Modify(Player player)
