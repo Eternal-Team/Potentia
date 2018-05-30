@@ -33,12 +33,11 @@ namespace Potentia.Cable
 		{
 			for (int i = 0; i < tiles.Count; i++)
 			{
-				CableGrid newGrid = new CableGrid();
-				newGrid.energy.SetMaxTransfer(tiles[i].maxIO);
-				newGrid.energy.SetCapacity(tiles[i].maxIO * 2);
-				newGrid.energy.ModifyEnergyStored(GetEnergySharePerNode);
-				newGrid.tiles.Add(tiles[i]);
-				tiles[i].grid = newGrid;
+				tiles[i].grid = new CableGrid
+				{
+					energy = new EnergyStorage(tiles[i].maxIO * 2, tiles[i].maxIO).ModifyEnergyStored(GetEnergySharePerNode),
+					tiles = new List<Cable> { tiles[i] }
+				};
 			}
 
 			for (int i = 0; i < tiles.Count; i++) tiles[i].Merge();

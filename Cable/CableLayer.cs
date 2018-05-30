@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using TheOneLibrary.Base;
 using TheOneLibrary.Energy.Energy;
@@ -87,7 +88,8 @@ namespace Potentia.Cable
 		public override void Remove(Player player)
 		{
 			Point16 mouse = new Point16(Player.tileTargetX, Player.tileTargetY);
-			if (ContainsKey(mouse)) this[mouse].Remove();
+			//if (ContainsKey(mouse)) this[mouse].Remove();
+			if (ContainsKey(mouse)) Info(player);
 		}
 
 		public override void Modify(Player player)
@@ -131,21 +133,22 @@ namespace Potentia.Cable
 
 		public override void Load(List<TagCompound> tags)
 		{
-			foreach (TagCompound tag in tags) Add(tag.Get<Point16>("Key"), (Cable)new Cable().LoadAtt(tag.GetCompound("Value")));
-
-			foreach (Cable cable in Values)
+			Clear();
+			foreach (var pair in tags.Select(x => new KeyValuePair<Point16, Cable>(x.Get<Point16>("Key"), (Cable)new Cable().LoadAtt(x.GetCompound("Value")))).ToDictionary(x => x.Key, x => x.Value))
 			{
-				CableGrid grid = new CableGrid();
-				grid.energy.SetCapacity(cable.maxIO * 2);
-				grid.energy.SetMaxTransfer(cable.maxIO);
-				grid.tiles.Add(cable);
-				grid.energy.ModifyEnergyStored(cable.share);
+				Cable cable = pair.Value;
+				cable.maxIO = ((BaseCable)Potentia.Instance.GetItem(cable.name)).MaxIO;
 				cable.layer = this;
+				cable.grid = new CableGrid
+				{
+					energy = new EnergyStorage(cable.maxIO * 2, cable.maxIO).ModifyEnergyStored(cable.share),
+					tiles = new List<Cable> { cable }
+				};
+				ErrorLogger.Log(cable.grid.energy);
 				cable.share = 0;
-				cable.grid = grid;
+				cable.Merge();
+				Add(pair.Key, cable);
 			}
-
-			foreach (Cable cable in Values) cable.Merge();
 		}
 	}
 }

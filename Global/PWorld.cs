@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Potentia.Cable;
+using Potentia.Tiles;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.Xna.Framework.Graphics;
-using Potentia.Cable;
-using Potentia.Tiles;
 using Terraria;
 using Terraria.GameContent.Generation;
 using Terraria.ModLoader;
@@ -21,15 +21,13 @@ namespace Potentia.Global
 		public int[,] oil;
 		public int[,] gas;
 
-		public CableLayer layer;
+		public CableLayer layer = new CableLayer();
 
 		public float RandomWeighted(float min, float max, float cap, int percent) => Main.rand.Next(0, 101) > percent ? Main.rand.NextFloat(min, cap) : Main.rand.NextFloat(cap, max);
 
 		public override void Initialize()
 		{
 			Instance = this;
-
-			layer = new CableLayer();
 		}
 
 		public override void ModifyWorldGenTasks(List<GenPass> tasks, ref float totalWeight)
@@ -104,8 +102,16 @@ namespace Potentia.Global
 			layer.Load(tag.GetList<TagCompound>("Layer").ToList());
 		}
 
-		public override void NetSend(BinaryWriter writer) => TagIO.Write(Save(), writer);
+		// => TagIO.Write(Save(), writer);
+		public override void NetSend(BinaryWriter writer)
+		{
+			TagIO.Write(new TagCompound { ["Layer"] = layer.Save() }, writer);
+		}
 
-		public override void NetReceive(BinaryReader reader) => Load(TagIO.Read(reader));
+		// => Load(TagIO.Read(reader));
+		public override void NetReceive(BinaryReader reader)
+		{
+			layer.Load(TagIO.Read(reader).GetList<TagCompound>("Layer").ToList());
+		}
 	}
 }

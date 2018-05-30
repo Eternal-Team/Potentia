@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Potentia.Global;
+using System.Collections.Generic;
+using System.IO;
 using Terraria.ModLoader;
 using Terraria.UI;
 using TheOneLibrary.Base;
@@ -44,6 +46,8 @@ namespace Potentia
 		{
 			UIs.Draw(layers);
 		}
+
+		public override void HandlePacket(BinaryReader reader, int whoAmI) => Net.HandlePacket(reader, whoAmI);
 	}
 
 	//public class TestUI : BaseUI

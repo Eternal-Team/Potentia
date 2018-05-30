@@ -46,6 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Global\Net.cs" />
     <Compile Include="Items\Cables\BaseCable.cs" />
     <Compile Include="Items\Cables\BasicCable.cs" />
     <Compile Include="Cable\CableLayer.cs" />

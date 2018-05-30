@@ -30,15 +30,13 @@ namespace Potentia.TileEntities.Generators
 			return -1;
 		}
 
-		//public override void Update()
-		//{
-		//	int reverseHeight = Main.maxTilesY - Position.Y + 1;
-		//	energyGen = Math.Min(reverseHeight, energy.GetCapacity() - energy.GetEnergy());
+		public override void Update()
+		{
+			//int reverseHeight = Main.maxTilesY - Position.Y + 1;
+			//energyGen = Math.Min(reverseHeight, energy.GetCapacity() - energy.GetEnergy());
 
-		//	//energy.ModifyEnergyStored(energyGen);
-
-		//	this.HandleUIFar();
-		//}
+			energy.ModifyEnergyStored(10);
+		}
 
 		public long GetEnergy() => energy.GetEnergy();
 
