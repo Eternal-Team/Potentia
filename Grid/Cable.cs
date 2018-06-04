@@ -1,8 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Potentia.Items.Cables;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Potentia.Global;
+using Potentia.Items.Cables;
 using Terraria;
 using Terraria.DataStructures;
 using TheOneLibrary.Base;
@@ -10,7 +11,7 @@ using TheOneLibrary.Energy.Energy;
 using TheOneLibrary.Layer;
 using TheOneLibrary.Utils;
 
-namespace Potentia.Cable
+namespace Potentia.Grid
 {
 	public enum IO
 	{
@@ -93,6 +94,7 @@ namespace Potentia.Cable
 							if (connections[i]) grid.MergeGrids(secCable.grid);
 							secCable.Frame();
 						}
+
 						Frame();
 					}
 				}
@@ -109,8 +111,10 @@ namespace Potentia.Cable
 			Item.NewItem(position.ToVector2() * 16, new Vector2(16), Potentia.Instance.ItemType(name));
 
 			foreach (Point16 point in sides.Select(x => x + position).Where(x => layer.ContainsKey(x))) layer[point].Frame();
+
+			Net.SendCableRemovement(this);
 		}
-		
+
 		public void Merge()
 		{
 			List<Point16> list = sides.Select(x => x + position).ToList();

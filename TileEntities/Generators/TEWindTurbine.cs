@@ -1,4 +1,5 @@
-﻿using Potentia.Tiles.Generators;
+﻿using System.IO;
+using Potentia.Tiles.Generators;
 using Potentia.UI.Generators;
 using Terraria;
 using Terraria.ID;
@@ -35,8 +36,13 @@ namespace Potentia.TileEntities.Generators
 			//int reverseHeight = Main.maxTilesY - Position.Y + 1;
 			//energyGen = Math.Min(reverseHeight, energy.GetCapacity() - energy.GetEnergy());
 
-			energy.ModifyEnergyStored(10);
+			energy.ModifyEnergyStored(100);
+			Utility.SendTEData(this);
 		}
+
+		public override void NetSend(BinaryWriter writer, bool lightSend) => this.NetSendAtt(writer);
+
+		public override void NetReceive(BinaryReader reader, bool lightReceive) => this.NetReceiveAtt(reader);
 
 		public long GetEnergy() => energy.GetEnergy();
 

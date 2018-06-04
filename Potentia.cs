@@ -1,8 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Potentia.Global;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Potentia.Global;
+using Potentia.Grid;
+using Terraria.DataStructures;
 using Terraria.ModLoader;
 using Terraria.UI;
 using TheOneLibrary.Base;
@@ -45,6 +48,15 @@ namespace Potentia
 		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
 		{
 			UIs.Draw(layers);
+		}
+
+		public override void PostUpdateInput()
+		{
+			if (Keys.Home.IsKeyDown())
+				foreach (KeyValuePair<Point16, Cable> keyValuePair in PWorld.Instance.layer)
+				{
+					keyValuePair.Value.Frame();
+				}
 		}
 
 		public override void HandlePacket(BinaryReader reader, int whoAmI) => Net.HandlePacket(reader, whoAmI);

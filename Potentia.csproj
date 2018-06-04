@@ -49,10 +49,9 @@
     <Compile Include="Global\Net.cs" />
     <Compile Include="Items\Cables\BaseCable.cs" />
     <Compile Include="Items\Cables\BasicCable.cs" />
-    <Compile Include="Cable\CableLayer.cs" />
-    <Compile Include="Cable\FacingIndexedList.cs" />
-    <Compile Include="Cable\Cable.cs" />
-    <Compile Include="Cable\CableGrid.cs" />
+    <Compile Include="Grid\CableLayer.cs" />
+    <Compile Include="Grid\Cable.cs" />
+    <Compile Include="Grid\CableGrid.cs" />
     <Compile Include="Global\PWorld.cs" />
     <Compile Include="Items\Coal.cs" />
     <Compile Include="Items\Generators\WindTurbine.cs" />

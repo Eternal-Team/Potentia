@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using Potentia.Cable;
-using Potentia.Tiles;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Xna.Framework.Graphics;
+using Potentia.Grid;
+using Potentia.Tiles;
 using Terraria;
 using Terraria.GameContent.Generation;
 using Terraria.ModLoader;
@@ -102,16 +102,27 @@ namespace Potentia.Global
 			layer.Load(tag.GetList<TagCompound>("Layer").ToList());
 		}
 
-		// => TagIO.Write(Save(), writer);
 		public override void NetSend(BinaryWriter writer)
 		{
-			TagIO.Write(new TagCompound { ["Layer"] = layer.Save() }, writer);
+			using (MemoryStream stream = new MemoryStream())
+			{
+				TagIO.ToStream(Save(), stream);
+				byte[] data = stream.ToArray();
+				writer.Write(data.Length);
+				writer.Write(data);
+				Console.WriteLine($"{data.Length / 1000f:F3}kB");
+			}
 		}
 
-		// => Load(TagIO.Read(reader));
 		public override void NetReceive(BinaryReader reader)
 		{
-			layer.Load(TagIO.Read(reader).GetList<TagCompound>("Layer").ToList());
+			int count = reader.ReadInt32();
+			using (MemoryStream stream = new MemoryStream(reader.ReadBytes(count)))
+			{
+				Load(TagIO.FromStream(stream));
+			}
+
+			//layer.Load(TagIO.Read(reader).GetList<TagCompound>("Layer").ToList());
 		}
 	}
 }

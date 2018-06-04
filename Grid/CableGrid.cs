@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using TheOneLibrary.Energy.Energy;
 
-namespace Potentia.Cable
+namespace Potentia.Grid
 {
 	public class CableGrid
 	{

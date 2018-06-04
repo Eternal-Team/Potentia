@@ -1,8 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Potentia.Items.Cables;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Potentia.Global;
+using Potentia.Items.Cables;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
@@ -12,7 +13,7 @@ using TheOneLibrary.Energy.Energy;
 using TheOneLibrary.Layer;
 using TheOneLibrary.Utils;
 
-namespace Potentia.Cable
+namespace Potentia.Grid
 {
 	public class CableLayer : ModLayer<Cable>
 	{
@@ -76,11 +77,9 @@ namespace Potentia.Cable
 			cable.Merge();
 			cable.Frame();
 
-			foreach (Point16 point in Cable.sides.Select(x => x + mouse).Where(ContainsKey))
-			{
-				Cable merge = this[point];
-				if (merge.name == name) merge.Frame();
-			}
+			foreach (Cable merge in Cable.sides.Select(x => x + mouse).Where(ContainsKey).Select(x => this[x]).Where(x => x.name == name)) merge.Frame();
+
+			Net.SendCablePlacement(mouse, name);
 
 			return true;
 		}
@@ -88,8 +87,8 @@ namespace Potentia.Cable
 		public override void Remove(Player player)
 		{
 			Point16 mouse = new Point16(Player.tileTargetX, Player.tileTargetY);
-			//if (ContainsKey(mouse)) this[mouse].Remove();
-			if (ContainsKey(mouse)) Info(player);
+			if (ContainsKey(mouse)) this[mouse].Remove();
+			//if (ContainsKey(mouse)) Info(player);
 		}
 
 		public override void Modify(Player player)
