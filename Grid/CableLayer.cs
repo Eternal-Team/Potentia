@@ -1,9 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Potentia.Global;
+using Potentia.Items;
 using Potentia.Items.Cables;
-using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader.IO;
@@ -20,7 +21,7 @@ namespace Potentia.Grid
 		public override void Draw(SpriteBatch spriteBatch)
 		{
 			if (Main.LocalPlayer.GetHeldItem().modItem == null) return;
-			if (!(Main.LocalPlayer.GetHeldItem().modItem is BaseCable) && !Main.LocalPlayer.GetHeldItem().modItem.GetType().HasAttribute<EnergyTileAttribute>()) return;
+			if (!(Main.LocalPlayer.GetHeldItem().modItem is BaseCable) && !Main.LocalPlayer.GetHeldItem().modItem.GetType().HasAttribute<EnergyTileAttribute>() && !(Main.LocalPlayer.GetHeldItem().modItem is Wrench)) return;
 
 			DrawPreview(Main.spriteBatch, Main.LocalPlayer.GetHeldItem().modItem.Name);
 

@@ -1,8 +1,7 @@
-﻿using System;
-using Potentia.Grid;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Potentia.Grid;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;

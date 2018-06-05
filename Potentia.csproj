@@ -58,6 +58,7 @@
     <Compile Include="Items\Generators\WaterTurbine.cs" />
     <Compile Include="Items\Generators\SolarPanel.cs" />
     <Compile Include="Items\WaterPump.cs" />
+    <Compile Include="Items\Wrench.cs" />
     <Compile Include="Potentia.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TileEntities\Generators\TESolarPanel.cs" />

@@ -26,7 +26,7 @@ namespace Potentia.Grid
 			if (tiles.Contains(tile))
 			{
 				tiles.Remove(tile);
-				ReformGrid(); 
+				ReformGrid();
 			}
 		}
 
@@ -48,7 +48,7 @@ namespace Potentia.Grid
 				tiles[i].grid.energy.ModifyEnergyStored(share);
 			}
 
-			for (int i = 0; i < tiles.Count; i++)	tiles[i].Merge();
+			for (int i = 0; i < tiles.Count; i++) tiles[i].Merge();
 		}
 	}
 }
