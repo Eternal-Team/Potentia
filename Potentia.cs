@@ -7,6 +7,7 @@ using Potentia.Global;
 using Potentia.Grid;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using Terraria.UI;
 using TheOneLibrary.Base;
 using TheOneLibrary.Base.UI;
@@ -32,6 +33,7 @@ namespace Potentia
 		public override void Load()
 		{
 			Instance = this;
+
 			Utility.LoadTextures();
 		}
 

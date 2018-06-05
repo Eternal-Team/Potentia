@@ -110,7 +110,6 @@ namespace Potentia.Global
 				byte[] data = stream.ToArray();
 				writer.Write(data.Length);
 				writer.Write(data);
-				Console.WriteLine($"{data.Length / 1000f:F3}kB");
 			}
 		}
 
@@ -121,8 +120,6 @@ namespace Potentia.Global
 			{
 				Load(TagIO.FromStream(stream));
 			}
-
-			//layer.Load(TagIO.Read(reader).GetList<TagCompound>("Layer").ToList());
 		}
 	}
 }

@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using Potentia.Grid;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Potentia.Grid;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -17,7 +18,8 @@ namespace Potentia.Global
 		{
 			CablePlacement,
 			CableRemovement,
-			CableModification
+			CableModification,
+			GridEnergy
 		}
 
 		public static void HandlePacket(BinaryReader reader, int sender)
@@ -33,6 +35,9 @@ namespace Potentia.Global
 					break;
 				case MessageType.CableModification:
 					ReceiveCableModification(reader, sender);
+					break;
+				case MessageType.GridEnergy:
+					ReceiveGridEnergy(reader, sender);
 					break;
 			}
 		}
@@ -78,18 +83,17 @@ namespace Potentia.Global
 
 		public static void ReceiveCableRemovement(BinaryReader reader, int sender)
 		{
-			Cable cable = PWorld.Instance.layer[TagIO.Read(reader).Get<Point16>("Cable")];
+			Cable cable = PWorld.Instance.layer[TagIO.Read(reader).Get<Point16>("Position")];
 
-			cable.grid.tiles.Remove(cable.grid.tiles.First(x => x.position == cable.position));
-			cable.grid.ReformGrid();
+			cable.grid.RemoveTile(cable);
 			PWorld.Instance.layer.Remove(cable.position);
 
 			foreach (Point16 point in Cable.sides.Select(x => x + cable.position).Where(x => PWorld.Instance.layer.ContainsKey(x))) PWorld.Instance.layer[point].Frame();
 
-			if (Main.netMode == NetmodeID.Server) SendCableRemovement(cable, sender);
+			if (Main.netMode == NetmodeID.Server) SendCableRemovement(cable.position, sender);
 		}
 
-		public static void SendCableRemovement(Cable cable, int excludedPlayer = -1)
+		public static void SendCableRemovement(Point16 position, int excludedPlayer = -1)
 		{
 			if (Main.netMode == NetmodeID.SinglePlayer) return;
 
@@ -97,7 +101,7 @@ namespace Potentia.Global
 			packet.Write((byte)MessageType.CableRemovement);
 			TagIO.Write(new TagCompound
 			{
-				["Cable"] = cable.position
+				["Position"] = position
 			}, packet);
 			packet.Send(ignoreClient: excludedPlayer);
 		}
@@ -108,6 +112,34 @@ namespace Potentia.Global
 
 		public static void SendCableModification()
 		{
+		}
+
+		public static void ReceiveGridEnergy(BinaryReader reader, int sender)
+		{
+			TagCompound tag = TagIO.Read(reader);
+			Point16 position = tag.Get<Point16>("Position");
+			long delta = tag.GetLong("Energy");
+
+			if (PWorld.Instance.layer.ContainsKey(position))
+			{
+				PWorld.Instance.layer[position].grid.energy.ModifyEnergyStored(delta);
+
+				if (Main.netMode == NetmodeID.Server) SendGridEnergy(position, delta, sender);
+			}
+		}
+
+		public static void SendGridEnergy(Point16 position, long delta, int excludedPlayer = -1)
+		{
+			if (Main.netMode == NetmodeID.SinglePlayer) return;
+
+			ModPacket packet = Potentia.Instance.GetPacket();
+			packet.Write((byte)MessageType.GridEnergy);
+			TagIO.Write(new TagCompound
+			{
+				["Position"] = position,
+				["Energy"] = delta
+			}, packet);
+			packet.Send(ignoreClient: excludedPlayer);
 		}
 	}
 }

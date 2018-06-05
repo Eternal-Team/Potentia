@@ -8,19 +8,25 @@ namespace Potentia.Grid
 		public List<Cable> tiles = new List<Cable>();
 		public EnergyStorage energy = new EnergyStorage();
 
-		public long GetEnergySharePerNode
-		{
-			get { return energy.GetEnergy() / tiles.Count; }
-		}
+		public float GetEnergySharePerNode() => (float)energy.GetEnergy() / tiles.Count;
 
 		public void AddTile(Cable tile)
 		{
 			if (!tiles.Contains(tile))
 			{
 				energy.AddCapacity(tile.maxIO * 2);
-				energy.ModifyEnergyStored(tile.grid.GetEnergySharePerNode);
+				energy.ModifyEnergyStored((long)tile.grid.GetEnergySharePerNode());
 				tile.grid = this;
 				tiles.Add(tile);
+			}
+		}
+
+		public void RemoveTile(Cable tile)
+		{
+			if (tiles.Contains(tile))
+			{
+				tiles.Remove(tile);
+				ReformGrid(); 
 			}
 		}
 
@@ -31,16 +37,18 @@ namespace Potentia.Grid
 
 		public void ReformGrid()
 		{
+			long share = (long)GetEnergySharePerNode();
 			for (int i = 0; i < tiles.Count; i++)
 			{
 				tiles[i].grid = new CableGrid
 				{
-					energy = new EnergyStorage(tiles[i].maxIO * 2, tiles[i].maxIO).ModifyEnergyStored(GetEnergySharePerNode),
+					energy = new EnergyStorage(tiles[i].maxIO * 2, tiles[i].maxIO),
 					tiles = new List<Cable> { tiles[i] }
 				};
+				tiles[i].grid.energy.ModifyEnergyStored(share);
 			}
 
-			for (int i = 0; i < tiles.Count; i++) tiles[i].Merge();
+			for (int i = 0; i < tiles.Count; i++)	tiles[i].Merge();
 		}
 	}
 }

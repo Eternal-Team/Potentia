@@ -1,17 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Potentia.Global;
 using Potentia.Items.Cables;
+using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
-using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using TheOneLibrary.Base;
 using TheOneLibrary.Energy.Energy;
 using TheOneLibrary.Layer;
 using TheOneLibrary.Utils;
+using static Microsoft.Xna.Framework.Input.Keys;
 
 namespace Potentia.Grid
 {
@@ -72,6 +72,12 @@ namespace Potentia.Grid
 				energy = new EnergyStorage(cable.maxIO * 2, cable.maxIO),
 				tiles = new List<Cable> { cable }
 			};
+			//cable.energy = new Cable.Energy
+			//{
+			//	energy = new EnergyStorage(cable.maxIO * 2, cable.maxIO),
+			//	count = 1
+			//};
+
 			Add(mouse, cable);
 
 			cable.Merge();
@@ -87,8 +93,11 @@ namespace Potentia.Grid
 		public override void Remove(Player player)
 		{
 			Point16 mouse = new Point16(Player.tileTargetX, Player.tileTargetY);
-			if (ContainsKey(mouse)) this[mouse].Remove();
-			//if (ContainsKey(mouse)) Info(player);
+			if (ContainsKey(mouse))
+			{
+				if (RightAlt.IsKeyDown()) Info(player);
+				else this[mouse].Remove();
+			}
 		}
 
 		public override void Modify(Player player)
@@ -103,11 +112,13 @@ namespace Potentia.Grid
 			if (ContainsKey(mouse))
 			{
 				Cable cable = this[mouse];
+				//Main.NewText($"{cable.energy.energy} {cable.energy.count}");
 
 				Main.NewText("Tiles: " + cable.grid.tiles.Count);
-				Main.NewText("Current capacity: " + cable.grid.energy.GetCapacity());
-				Main.NewText("Current IO: " + cable.grid.energy.GetMaxReceive() + "/" + cable.grid.energy.GetMaxExtract());
-				Main.NewText("Current energy: " + cable.grid.energy.GetEnergy());
+				Main.NewText("Energy: " + cable.grid.energy);
+				//Main.NewText("Current capacity: " + cable.grid.energy.GetCapacity());
+				//Main.NewText("Current IO: " + cable.grid.energy.GetMaxReceive() + "/" + cable.grid.energy.GetMaxExtract());
+				//Main.NewText("Current energy: " + cable.grid.energy.GetEnergy());
 			}
 		}
 
@@ -124,6 +135,7 @@ namespace Potentia.Grid
 				TagCompound tag = new TagCompound();
 				tag["Key"] = pair.Key;
 				tag["Value"] = pair.Value.SaveAtt();
+				tag["Share"] = pair.Value.grid.GetEnergySharePerNode();
 				tags.Add(tag);
 			}
 
@@ -133,21 +145,22 @@ namespace Potentia.Grid
 		public override void Load(List<TagCompound> tags)
 		{
 			Clear();
-			foreach (var pair in tags.Select(x => new KeyValuePair<Point16, Cable>(x.Get<Point16>("Key"), (Cable)new Cable().LoadAtt(x.GetCompound("Value")))).ToDictionary(x => x.Key, x => x.Value))
+
+			foreach (TagCompound tag in tags)
 			{
-				Cable cable = pair.Value;
+				Cable cable = (Cable)new Cable().LoadAtt(tag.GetCompound("Value"));
 				cable.maxIO = ((BaseCable)Potentia.Instance.GetItem(cable.name)).MaxIO;
 				cable.layer = this;
 				cable.grid = new CableGrid
 				{
-					energy = new EnergyStorage(cable.maxIO * 2, cable.maxIO).ModifyEnergyStored(cable.share),
+					energy = new EnergyStorage(cable.maxIO * 2, cable.maxIO),
 					tiles = new List<Cable> { cable }
 				};
-				ErrorLogger.Log(cable.grid.energy);
-				cable.share = 0;
-				cable.Merge();
-				Add(pair.Key, cable);
+				cable.grid.energy.ModifyEnergyStored((long)tag.GetFloat("Share"));
+				Add(tag.Get<Point16>("Key"), cable);
 			}
+
+			foreach (Cable cable in Values) cable.Merge();
 		}
 	}
 }

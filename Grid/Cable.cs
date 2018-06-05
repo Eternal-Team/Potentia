@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Potentia.Global;
 using Potentia.Items.Cables;
+using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.ID;
 using TheOneLibrary.Base;
 using TheOneLibrary.Energy.Energy;
 using TheOneLibrary.Layer;
@@ -17,7 +18,6 @@ namespace Potentia.Grid
 	{
 		In,
 		Out,
-		Both,
 		Blocked
 	}
 
@@ -50,13 +50,12 @@ namespace Potentia.Grid
 		public CableGrid grid;
 		public CableLayer layer;
 
-		public long share;
 		public long maxIO;
 
 		[Save] public string name;
 		[Save] public Point16 position;
 		[Save] public Point16 frame;
-		[Save] public IO IO = IO.Both;
+		[Save] public IO IO = IO.In;
 		[Save] public List<bool> connections = new List<bool> { true, true, true, true };
 
 		public void SetDefaults(string name)
@@ -84,16 +83,16 @@ namespace Potentia.Grid
 					{
 						connections[i] = !connections[i];
 
-						if (!connections[i]) grid.ReformGrid();
+						//if (!connections[i]) grid.ReformGrid();
 
-						if (layer.ContainsKey(position + sides[i]))
-						{
-							Cable secCable = layer[position + sides[i]];
-							int counterpart = i.Counterpart();
-							secCable.connections[counterpart] = !secCable.connections[counterpart];
-							if (connections[i]) grid.MergeGrids(secCable.grid);
-							secCable.Frame();
-						}
+						//if (layer.ContainsKey(position + sides[i]))
+						//{
+						//	Cable secCable = layer[position + sides[i]];
+						//	int counterpart = i.Counterpart();
+						//	secCable.connections[counterpart] = !secCable.connections[counterpart];
+						//	if (connections[i]) grid.MergeGrids(secCable.grid);
+						//	secCable.Frame();
+						//}
 
 						Frame();
 					}
@@ -104,15 +103,15 @@ namespace Potentia.Grid
 
 		public void Remove()
 		{
-			grid.tiles.Remove(this);
-			grid.ReformGrid();
+			grid.RemoveTile(this);
 			layer.Remove(position);
 
-			Item.NewItem(position.ToVector2() * 16, new Vector2(16), Potentia.Instance.ItemType(name));
+			int i = Item.NewItem(position.ToVector2() * 16, new Vector2(16), Potentia.Instance.ItemType(name));
+			NetMessage.SendData(MessageID.SyncItem, -1, -1, null, i);
 
 			foreach (Point16 point in sides.Select(x => x + position).Where(x => layer.ContainsKey(x))) layer[point].Frame();
 
-			Net.SendCableRemovement(this);
+			Net.SendCableRemovement(position);
 		}
 
 		public void Merge()
@@ -120,7 +119,7 @@ namespace Potentia.Grid
 			List<Point16> list = sides.Select(x => x + position).ToList();
 			for (int i = 0; i < 4; i++)
 			{
-				if (layer.ContainsKey(list[i]) && connections[i] && layer[list[i]].connections[i.Counterpart()]) grid.MergeGrids(layer[list[i]].grid);
+				if (layer.ContainsKey(list[i]) && connections[i] && layer[list[i]].connections[i.Counterpart()]) layer[list[i]].grid.MergeGrids(grid);
 			}
 		}
 
@@ -132,18 +131,19 @@ namespace Potentia.Grid
 			{
 				TileEntity te = TileEntity.ByPosition[check];
 
-				if ((IO == IO.In || IO == IO.Both) && te is IEnergyProvider)
+				if (IO == IO.In && te is IEnergyProvider)
 				{
 					IEnergyProvider provider = (IEnergyProvider)te;
-					provider.GetEnergyStorage().ModifyEnergyStored(-grid.energy.ReceiveEnergy(Utility.Min(grid.energy.GetMaxReceive(), Utility.Min(grid.energy.GetCapacity() - grid.energy.GetEnergy(), provider.GetEnergyStorage().GetEnergy()))));
-
-					// remove cables which are on a IEnergyStorage after you extract from it?
+					long delta = grid.energy.ReceiveEnergy(Utility.Min(grid.energy.GetMaxReceive(), provider.GetEnergyStorage().GetMaxExtract(), provider.GetEnergy()));
+					provider.GetEnergyStorage().ModifyEnergyStored(-delta);
+					Net.SendGridEnergy(position, delta);
 				}
-
-				if ((IO == IO.Out || IO == IO.Both) && te is IEnergyReceiver)
+				else if (IO == IO.Out && te is IEnergyReceiver)
 				{
 					IEnergyReceiver receiver = (IEnergyReceiver)te;
-					receiver.GetEnergyStorage().ModifyEnergyStored(grid.energy.ExtractEnergy(Utility.Min(grid.energy.GetMaxExtract(), Utility.Min(grid.energy.GetEnergy(), receiver.GetCapacity() - receiver.GetEnergy()))));
+					long delta = -grid.energy.ExtractEnergy(Utility.Min(grid.energy.GetMaxExtract(), receiver.GetEnergyStorage().GetMaxReceive(), receiver.GetCapacity() - receiver.GetEnergy()));
+					receiver.GetEnergyStorage().ModifyEnergyStored(-delta);
+					Net.SendGridEnergy(position, delta);
 				}
 			}
 		}
