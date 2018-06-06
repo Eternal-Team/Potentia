@@ -73,11 +73,6 @@ namespace Potentia.Grid
 				energy = new EnergyStorage(cable.maxIO * 2, cable.maxIO),
 				tiles = new List<Cable> { cable }
 			};
-			//cable.energy = new Cable.Energy
-			//{
-			//	energy = new EnergyStorage(cable.maxIO * 2, cable.maxIO),
-			//	count = 1
-			//};
 
 			Add(mouse, cable);
 
@@ -86,7 +81,7 @@ namespace Potentia.Grid
 
 			foreach (Cable merge in Cable.sides.Select(x => x + mouse).Where(ContainsKey).Select(x => this[x]).Where(x => x.name == name)) merge.Frame();
 
-			Net.SendCablePlacement(mouse, name);
+			Net.SendCablePlacement(cable);
 
 			return true;
 		}
@@ -113,13 +108,9 @@ namespace Potentia.Grid
 			if (ContainsKey(mouse))
 			{
 				Cable cable = this[mouse];
-				//Main.NewText($"{cable.energy.energy} {cable.energy.count}");
 
 				Main.NewText("Tiles: " + cable.grid.tiles.Count);
 				Main.NewText("Energy: " + cable.grid.energy);
-				//Main.NewText("Current capacity: " + cable.grid.energy.GetCapacity());
-				//Main.NewText("Current IO: " + cable.grid.energy.GetMaxReceive() + "/" + cable.grid.energy.GetMaxExtract());
-				//Main.NewText("Current energy: " + cable.grid.energy.GetEnergy());
 			}
 		}
 
@@ -161,7 +152,11 @@ namespace Potentia.Grid
 				Add(tag.Get<Point16>("Key"), cable);
 			}
 
-			foreach (Cable cable in Values) cable.Merge();
+			foreach (Cable cable in Values)
+			{
+				cable.Frame();
+				cable.Merge();
+			}
 		}
 	}
 }

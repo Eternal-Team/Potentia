@@ -30,6 +30,7 @@ namespace Potentia.Global
 			Instance = this;
 		}
 
+		#region Generation
 		public override void ModifyWorldGenTasks(List<GenPass> tasks, ref float totalWeight)
 		{
 			int ShiniesIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Shinies"));
@@ -40,19 +41,23 @@ namespace Potentia.Global
 					progress.Message = "Fossilising dinosaurs";
 
 					GenerateOilGas();
-
-					for (int k = 0; k < (int)(Main.maxTilesX * Main.maxTilesY * 3E-05); k++)
-					{
-						int x = WorldGen.genRand.Next(0, Main.maxTilesX);
-						int y = WorldGen.genRand.Next((int)WorldGen.worldSurfaceLow, Main.maxTilesY - 200);
-
-						WorldGen.TileRunner(x, y, WorldGen.genRand.Next(5, 10), WorldGen.genRand.Next(150, 200), mod.TileType<Coal>());
-					}
+					GenerateCoal();
 				}));
 			}
 		}
 
-		public void GenerateOilGas()
+		private void GenerateCoal()
+		{
+			for (int k = 0; k < (int)(Main.maxTilesX * Main.maxTilesY * 3E-05); k++)
+			{
+				int x = WorldGen.genRand.Next(0, Main.maxTilesX);
+				int y = WorldGen.genRand.Next((int)WorldGen.worldSurfaceLow, Main.maxTilesY - 200);
+
+				WorldGen.TileRunner(x, y, WorldGen.genRand.Next(5, 10), WorldGen.genRand.Next(150, 200), mod.TileType<Coal>());
+			}
+		}
+
+		private void GenerateOilGas()
 		{
 			oil = new int[Main.maxTilesX / 50, Main.maxTilesY / 50];
 			gas = new int[Main.maxTilesX / 50, Main.maxTilesY / 50];
@@ -66,6 +71,7 @@ namespace Potentia.Global
 				}
 			}
 		}
+		#endregion
 
 		public override void PreUpdate()
 		{

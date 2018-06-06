@@ -7,4 +7,9 @@
     <StartWorkingDirectory>C:\Program Files %28x86%29\Steam\steamapps\common\Terraria [Modded]</StartWorkingDirectory>
     <RemoteDebugEnabled>false</RemoteDebugEnabled>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <StartWorkingDirectory>C:\Program Files %28x86%29\Steam\steamapps\common\Terraria [Modded]</StartWorkingDirectory>
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\Program Files %28x86%29\Steam\steamapps\common\Terraria [Modded]\debug-MP.bat</StartProgram>
+  </PropertyGroup>
 </Project>

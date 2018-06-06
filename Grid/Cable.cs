@@ -54,7 +54,7 @@ namespace Potentia.Grid
 
 		[Save] public string name;
 		[Save] public Point16 position;
-		[Save] public Point16 frame;
+		public Point16 frame;
 		[Save] public IO IO = IO.In;
 		[Save] public List<bool> connections = new List<bool> { true, true, true, true };
 
@@ -82,23 +82,39 @@ namespace Potentia.Grid
 					if (point.InTriangle(connectionTriangles[i]))
 					{
 						connections[i] = !connections[i];
+						Net.SendCableModification(this);
 
-						//if (!connections[i]) grid.ReformGrid();
+						if (!connections[i])
+						{
+							grid.ReformGrid();
+							Net.SendGridReform(this);
+						}
 
-						//if (layer.ContainsKey(position + sides[i]))
-						//{
-						//	Cable secCable = layer[position + sides[i]];
-						//	int counterpart = i.Counterpart();
-						//	secCable.connections[counterpart] = !secCable.connections[counterpart];
-						//	if (connections[i]) grid.MergeGrids(secCable.grid);
-						//	secCable.Frame();
-						//}
+						if (layer.ContainsKey(position + sides[i]))
+						{
+							Cable secCable = layer[position + sides[i]];
+							int counterpart = i.Counterpart();
+							secCable.connections[counterpart] = !secCable.connections[counterpart];
+							Net.SendCableModification(secCable);
+							if (connections[i])
+							{
+								grid.MergeGrids(secCable.grid);
+								Net.SendGridMerge(this, secCable);
+							}
 
-						Frame();
+							secCable.Frame();
+						}
 					}
+
+					Frame();
+					Net.SendCableModification(this);
 				}
 			}
-			else IO = IO.NextEnum();
+			else
+			{
+				IO = IO.NextEnum();
+				Net.SendCableModification(this);
+			}
 		}
 
 		public void Remove()
@@ -111,7 +127,7 @@ namespace Potentia.Grid
 
 			foreach (Point16 point in sides.Select(x => x + position).Where(x => layer.ContainsKey(x))) layer[point].Frame();
 
-			Net.SendCableRemovement(position);
+			Net.SendCableRemovement(this);
 		}
 
 		public void Merge()
@@ -156,7 +172,7 @@ namespace Potentia.Grid
 			spriteBatch.Draw(Potentia.Textures.cableTexture, position, new Rectangle(frame.X, frame.Y, 16, 16), color, 0f, Vector2.Zero, Vector2.One, SpriteEffects.None, 0f);
 
 			TileEntity te = TileEntity.ByPosition.ContainsKey(pos) ? TileEntity.ByPosition[pos] : null;
-			if (te != null && (te is IEnergyReceiver || te is IEnergyProvider)) spriteBatch.Draw(Potentia.Textures.cableIOTexture, position + new Vector2(4), new Rectangle((int)IO * 8, 0, 8, 8), Color.White);
+			if (te != null && (te is IEnergyReceiver || te is IEnergyProvider)) spriteBatch.Draw(Potentia.Textures.cableIOTexture, new Rectangle((int)(position.X + 4), (int)(position.Y + 4), 8, 8), new Rectangle((int)IO * 16, 0, 16, 16), Color.White);
 		}
 	}
 }

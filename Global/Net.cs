@@ -18,7 +18,9 @@ namespace Potentia.Global
 			CablePlacement,
 			CableRemovement,
 			CableModification,
-			GridEnergy
+			GridEnergy,
+			GridReform,
+			GridMerge
 		}
 
 		public static void HandlePacket(BinaryReader reader, int sender)
@@ -38,7 +40,27 @@ namespace Potentia.Global
 				case MessageType.GridEnergy:
 					ReceiveGridEnergy(reader, sender);
 					break;
+				case MessageType.GridReform:
+					ReceiveGridReform(reader, sender);
+					break;
+				case MessageType.GridMerge:
+					ReceiveGridMerge(reader, sender);
+					break;
 			}
+		}
+
+		public static void SendCablePlacement(Cable cable, int excludedPlayer = -1)
+		{
+			if (Main.netMode == NetmodeID.SinglePlayer) return;
+
+			ModPacket packet = Potentia.Instance.GetPacket();
+			packet.Write((byte)MessageType.CablePlacement);
+			TagIO.Write(new TagCompound
+			{
+				["Position"] = cable.position,
+				["Name"] = cable.name
+			}, packet);
+			packet.Send(ignoreClient: excludedPlayer);
 		}
 
 		public static void ReceiveCablePlacement(BinaryReader reader, int sender)
@@ -63,19 +85,18 @@ namespace Potentia.Global
 
 			foreach (Cable merge in Cable.sides.Select(x => x + position).Where(PWorld.Instance.layer.ContainsKey).Select(x => PWorld.Instance.layer[x]).Where(x => x.name == name)) merge.Frame();
 
-			if (Main.netMode == NetmodeID.Server) SendCablePlacement(position, name, sender);
+			if (Main.netMode == NetmodeID.Server) SendCablePlacement(cable, sender);
 		}
 
-		public static void SendCablePlacement(Point16 position, string name, int excludedPlayer = -1)
+		public static void SendCableRemovement(Cable cable, int excludedPlayer = -1)
 		{
 			if (Main.netMode == NetmodeID.SinglePlayer) return;
 
 			ModPacket packet = Potentia.Instance.GetPacket();
-			packet.Write((byte)MessageType.CablePlacement);
+			packet.Write((byte)MessageType.CableRemovement);
 			TagIO.Write(new TagCompound
 			{
-				["Position"] = position,
-				["Name"] = name
+				["Position"] = cable.position
 			}, packet);
 			packet.Send(ignoreClient: excludedPlayer);
 		}
@@ -89,28 +110,47 @@ namespace Potentia.Global
 
 			foreach (Point16 point in Cable.sides.Select(x => x + cable.position).Where(x => PWorld.Instance.layer.ContainsKey(x))) PWorld.Instance.layer[point].Frame();
 
-			if (Main.netMode == NetmodeID.Server) SendCableRemovement(cable.position, sender);
+			if (Main.netMode == NetmodeID.Server) SendCableRemovement(cable, sender);
 		}
 
-		public static void SendCableRemovement(Point16 position, int excludedPlayer = -1)
+		public static void SendCableModification(Cable cable, int excludedPlayer = -1)
 		{
 			if (Main.netMode == NetmodeID.SinglePlayer) return;
 
 			ModPacket packet = Potentia.Instance.GetPacket();
-			packet.Write((byte)MessageType.CableRemovement);
+			packet.Write((byte)MessageType.CableModification);
 			TagIO.Write(new TagCompound
 			{
-				["Position"] = position
+				["Position"] = cable.position,
+				["Connections"] = cable.connections,
+				["IO"] = (int)cable.IO
 			}, packet);
 			packet.Send(ignoreClient: excludedPlayer);
 		}
 
 		public static void ReceiveCableModification(BinaryReader reader, int sender)
 		{
+			TagCompound tag = TagIO.Read(reader);
+			Cable cable = PWorld.Instance.layer[tag.Get<Point16>("Position")];
+			cable.connections = tag.GetList<bool>("Connections").ToList();
+			cable.IO = (IO)tag.GetInt("IO");
+			cable.Frame();
+
+			if (Main.netMode == NetmodeID.Server) SendCableModification(cable, sender);
 		}
 
-		public static void SendCableModification()
+		public static void SendGridEnergy(Point16 position, long delta, int excludedPlayer = -1)
 		{
+			if (Main.netMode == NetmodeID.SinglePlayer) return;
+
+			ModPacket packet = Potentia.Instance.GetPacket();
+			packet.Write((byte)MessageType.GridEnergy);
+			TagIO.Write(new TagCompound
+			{
+				["Position"] = position,
+				["Energy"] = delta
+			}, packet);
+			packet.Send(ignoreClient: excludedPlayer);
 		}
 
 		public static void ReceiveGridEnergy(BinaryReader reader, int sender)
@@ -127,18 +167,52 @@ namespace Potentia.Global
 			}
 		}
 
-		public static void SendGridEnergy(Point16 position, long delta, int excludedPlayer = -1)
+		public static void SendGridReform(Cable cable, int excludedPlayer = -1)
 		{
 			if (Main.netMode == NetmodeID.SinglePlayer) return;
 
 			ModPacket packet = Potentia.Instance.GetPacket();
-			packet.Write((byte)MessageType.GridEnergy);
+			packet.Write((byte)MessageType.GridReform);
 			TagIO.Write(new TagCompound
 			{
-				["Position"] = position,
-				["Energy"] = delta
+				["Position"] = cable.position
 			}, packet);
 			packet.Send(ignoreClient: excludedPlayer);
+		}
+
+		public static void ReceiveGridReform(BinaryReader reader, int sender)
+		{
+			TagCompound tag = TagIO.Read(reader);
+			Cable cable = PWorld.Instance.layer[tag.Get<Point16>("Position")];
+
+			cable.grid.ReformGrid();
+
+			if (Main.netMode == NetmodeID.Server) SendGridReform(cable, sender);
+		}
+
+		public static void SendGridMerge(Cable cable1, Cable cable2, int excludedPlayer = -1)
+		{
+			if (Main.netMode == NetmodeID.SinglePlayer) return;
+
+			ModPacket packet = Potentia.Instance.GetPacket();
+			packet.Write((byte)MessageType.GridMerge);
+			TagIO.Write(new TagCompound
+			{
+				["Position1"] = cable1.position,
+				["Position2"] = cable2.position
+			}, packet);
+			packet.Send(ignoreClient: excludedPlayer);
+		}
+
+		public static void ReceiveGridMerge(BinaryReader reader, int sender)
+		{
+			TagCompound tag = TagIO.Read(reader);
+			Cable cable1 = PWorld.Instance.layer[tag.Get<Point16>("Position1")];
+			Cable cable2 = PWorld.Instance.layer[tag.Get<Point16>("Position2")];
+
+			cable1.grid.MergeGrids(cable2.grid);
+
+			if (Main.netMode == NetmodeID.Server) SendGridMerge(cable1, cable2, sender);
 		}
 	}
 }
