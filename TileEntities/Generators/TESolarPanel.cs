@@ -1,5 +1,4 @@
-﻿using System;
-using Potentia.Tiles.Generators;
+﻿using Potentia.Tiles.Generators;
 using Potentia.UI.Generators;
 using Terraria;
 using Terraria.ID;
@@ -36,7 +35,9 @@ namespace Potentia.TileEntities.Generators
 		{
 			efficiency = Main.dayTime ? (float)(Main.time < 13500 ? Main.time / 13500 : 13500 / (Main.time - 13500)) * 100f : 0;
 
-			energy.ModifyEnergyStored(Math.Min((long)(10 * efficiency), energy.GetCapacity() - energy.GetEnergy()));
+			energy.ModifyEnergyStored((long)(10 * efficiency));
+
+			Utility.SendTEData(this);
 		}
 
 		public long GetEnergy() => energy.GetEnergy();

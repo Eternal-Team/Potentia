@@ -75,7 +75,7 @@ namespace Potentia.Global
 			cable.layer = PWorld.Instance.layer;
 			cable.grid = new CableGrid
 			{
-				energy = new EnergyStorage(cable.maxIO * 2, cable.maxIO),
+				energy = new EnergyStorage(cable.MaxIO * 2, cable.MaxIO),
 				tiles = new List<Cable> { cable }
 			};
 			PWorld.Instance.layer.Add(position, cable);

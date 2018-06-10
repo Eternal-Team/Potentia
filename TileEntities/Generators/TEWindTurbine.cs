@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Potentia.Tiles.Generators;
+﻿using Potentia.Tiles.Generators;
 using Potentia.UI.Generators;
 using Terraria;
 using Terraria.ID;
@@ -39,10 +38,6 @@ namespace Potentia.TileEntities.Generators
 			energy.ModifyEnergyStored(100);
 			Utility.SendTEData(this);
 		}
-
-		public override void NetSend(BinaryWriter writer, bool lightSend) => this.NetSendAtt(writer);
-
-		public override void NetReceive(BinaryReader reader, bool lightReceive) => this.NetReceiveAtt(reader);
 
 		public long GetEnergy() => energy.GetEnergy();
 

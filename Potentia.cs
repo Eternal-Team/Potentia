@@ -2,11 +2,10 @@
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Potentia.Global;
 using Potentia.Grid;
-using Terraria.DataStructures;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using Terraria.UI;
 using TheOneLibrary.Base;
 using TheOneLibrary.Base.UI;
@@ -23,15 +22,19 @@ namespace Potentia
 
 			[Texture(Path + "CableGrid/BasicWire")] public static Texture2D cableTexture;
 			[Texture(Path + "CableGrid/Connections")] public static Texture2D cableIOTexture;
+			[Texture(TilePath + "WindTurbineBlade")] public static Texture2D turbineBladeTexture;
 		}
 
 		public static Potentia Instance;
+		public static CableSerializer serializer = new CableSerializer();
 
 		public GUIs UIs = new GUIs("Vanilla: Hotbar");
 
 		public override void Load()
 		{
 			Instance = this;
+
+			TagSerializer.AddSerializer(serializer);
 
 			Utility.LoadTextures();
 		}
@@ -49,15 +52,6 @@ namespace Potentia
 		public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
 		{
 			UIs.Draw(layers);
-		}
-
-		public override void PostUpdateInput()
-		{
-			if (Keys.Home.IsKeyDown())
-				foreach (KeyValuePair<Point16, Cable> keyValuePair in PWorld.Instance.layer)
-				{
-					keyValuePair.Value.Frame();
-				}
 		}
 
 		public override void HandlePacket(BinaryReader reader, int whoAmI) => Net.HandlePacket(reader, whoAmI);

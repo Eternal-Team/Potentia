@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Potentia.Grid;
+using Potentia.TileEntities.Generators;
 using Potentia.Tiles;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.GameContent.Generation;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
@@ -78,10 +81,26 @@ namespace Potentia.Global
 			layer.Update();
 		}
 
+		public float angle;
+
 		public override void PostDrawTiles()
 		{
 			RasterizerState rasterizer = Main.gameMenu || Math.Abs(Main.LocalPlayer.gravDir - 1.0) < 0.1 ? RasterizerState.CullCounterClockwise : RasterizerState.CullClockwise;
 			Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+			foreach (KeyValuePair<Point16, TileEntity> kvp in TileEntity.ByPosition.Where(x => x.Value is TEWindTurbine))
+			{
+				Vector2 position = new Vector2(kvp.Key.X * 16 - (int)Main.screenPosition.X + 8, kvp.Key.Y * 16 - (int)Main.screenPosition.Y + 22);
+
+				Color color = Lighting.GetColor(kvp.Key.X, kvp.Key.Y);
+
+				Main.spriteBatch.Draw(Potentia.Textures.turbineBladeTexture, position, null, color, MathHelper.ToRadians(angle), new Vector2(6, 42), Vector2.One, SpriteEffects.None, 0f);
+				Main.spriteBatch.Draw(Potentia.Textures.turbineBladeTexture, position, null, color, MathHelper.ToRadians(angle + 120f), new Vector2(6, 42), Vector2.One, SpriteEffects.None, 0f);
+				Main.spriteBatch.Draw(Potentia.Textures.turbineBladeTexture, position, null, color, MathHelper.ToRadians(angle + 240f), new Vector2(6, 42), Vector2.One, SpriteEffects.None, 0f);
+
+				angle += Math.Abs(Main.windSpeed * 15f);
+				if (angle > 360f) angle = 0;
+			}
 
 			layer.Draw(Main.spriteBatch);
 

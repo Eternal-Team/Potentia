@@ -70,7 +70,7 @@ namespace Potentia.Grid
 			cable.layer = this;
 			cable.grid = new CableGrid
 			{
-				energy = new EnergyStorage(cable.maxIO * 2, cable.maxIO),
+				energy = new EnergyStorage(cable.MaxIO * 2, cable.MaxIO),
 				tiles = new List<Cable> { cable }
 			};
 
@@ -122,13 +122,10 @@ namespace Potentia.Grid
 		public override List<TagCompound> Save()
 		{
 			List<TagCompound> tags = new List<TagCompound>();
-			foreach (KeyValuePair<Point16, Cable> pair in this)
+
+			foreach (Cable cable in Values)
 			{
-				TagCompound tag = new TagCompound();
-				tag["Key"] = pair.Key;
-				tag["Value"] = pair.Value.SaveAtt();
-				tag["Share"] = pair.Value.grid.GetEnergySharePerNode();
-				tags.Add(tag);
+				tags.Add(Potentia.serializer.Serialize(cable));
 			}
 
 			return tags;
@@ -140,16 +137,8 @@ namespace Potentia.Grid
 
 			foreach (TagCompound tag in tags)
 			{
-				Cable cable = (Cable)new Cable().LoadAtt(tag.GetCompound("Value"));
-				cable.maxIO = ((BaseCable)Potentia.Instance.GetItem(cable.name)).MaxIO;
-				cable.layer = this;
-				cable.grid = new CableGrid
-				{
-					energy = new EnergyStorage(cable.maxIO * 2, cable.maxIO),
-					tiles = new List<Cable> { cable }
-				};
-				cable.grid.energy.ModifyEnergyStored((long)tag.GetFloat("Share"));
-				Add(tag.Get<Point16>("Key"), cable);
+				Cable cable = Potentia.serializer.Deserialize(tag);
+				Add(cable.position, cable);
 			}
 
 			foreach (Cable cable in Values)

@@ -48,6 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Global\Net.cs" />
+    <Compile Include="Grid\CableSerializer.cs" />
+    <Compile Include="Grid\IO.cs" />
     <Compile Include="Items\Cables\BaseCable.cs" />
     <Compile Include="Items\Cables\BasicCable.cs" />
     <Compile Include="Grid\CableLayer.cs" />
@@ -78,6 +80,9 @@
   <ItemGroup>
     <Content Include="build.txt" />
     <Content Include="description.txt" />
+    <Content Include="Textures\CableGrid\BasicWire.png" />
+    <Content Include="Textures\CableGrid\Connections.png" />
+    <Content Include="Textures\Tiles\Coal.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TheOneLibrary\TheOneLibrary.csproj">

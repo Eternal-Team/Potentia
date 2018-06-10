@@ -7,22 +7,15 @@ using Potentia.Items.Cables;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
-using TheOneLibrary.Base;
 using TheOneLibrary.Energy.Energy;
 using TheOneLibrary.Layer;
 using TheOneLibrary.Utils;
 
 namespace Potentia.Grid
 {
-	public enum IO
-	{
-		In,
-		Out,
-		Blocked
-	}
-
 	public class Cable : ModLayerElement
 	{
+		#region Readonly fields
 		public static readonly Point16[] sides =
 		{
 			new Point16(-1, 0),
@@ -46,22 +39,28 @@ namespace Potentia.Grid
 			new[] { new Point(0, 0), new Point(16, 0), new Point(8, 8) },
 			new[] { new Point(0, 16), new Point(8, 8), new Point(16, 16) }
 		};
+		#endregion
 
 		public CableGrid grid;
 		public CableLayer layer;
 
-		public long maxIO;
-
-		[Save] public string name;
-		[Save] public Point16 position;
+		public Point16 position;
 		public Point16 frame;
-		[Save] public IO IO = IO.In;
-		[Save] public List<bool> connections = new List<bool> { true, true, true, true };
+		public string name;
+		public long MaxIO;
+		public IO IO = IO.In;
+		public List<bool> connections = new List<bool> { true, true, true, true };
+
+		public float Share
+		{
+			get { return grid.GetEnergySharePerNode(); }
+			set { grid.energy.ModifyEnergyStored((long)value); }
+		}
 
 		public void SetDefaults(string name)
 		{
 			this.name = name;
-			maxIO = ((BaseCable)Potentia.Instance.GetItem(name)).MaxIO;
+			MaxIO = ((BaseCable)Potentia.Instance.GetItem(name)).MaxIO;
 		}
 
 		public void Frame()

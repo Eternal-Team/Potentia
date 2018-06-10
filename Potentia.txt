@@ -12,5 +12,3 @@ Nuclear fission - fuel
 lightning rod
 
 Battery - modular
-
-Wires

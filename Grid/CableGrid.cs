@@ -14,7 +14,7 @@ namespace Potentia.Grid
 		{
 			if (!tiles.Contains(tile))
 			{
-				energy.AddCapacity(tile.maxIO * 2);
+				energy.AddCapacity(tile.MaxIO * 2);
 				energy.ModifyEnergyStored((long)tile.grid.GetEnergySharePerNode());
 				tile.grid = this;
 				tiles.Add(tile);
@@ -42,7 +42,7 @@ namespace Potentia.Grid
 			{
 				tiles[i].grid = new CableGrid
 				{
-					energy = new EnergyStorage(tiles[i].maxIO * 2, tiles[i].maxIO),
+					energy = new EnergyStorage(tiles[i].MaxIO * 2, tiles[i].MaxIO),
 					tiles = new List<Cable> { tiles[i] }
 				};
 				tiles[i].grid.energy.ModifyEnergyStored(share);

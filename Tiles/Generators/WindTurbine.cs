@@ -12,13 +12,15 @@ namespace Potentia.Tiles.Generators
 {
 	public class WindTurbine : BaseTile
 	{
+		public override string Texture => Potentia.Textures.TilePath + "WindTurbine";
+
 		public override void SetDefaults()
 		{
 			Main.tileSolid[Type] = false;
 			Main.tileFrameImportant[Type] = true;
 			Main.tileNoAttach[Type] = true;
 			Main.tileLavaDeath[Type] = true;
-			TileObjectData.newTile.Width = 3;
+			TileObjectData.newTile.Width = 1;
 			TileObjectData.newTile.Height = 6;
 			TileObjectData.newTile.Origin = new Point16(0, 5);
 			TileObjectData.newTile.AnchorBottom = new AnchorData(AnchorType.SolidTile, 1, 0);

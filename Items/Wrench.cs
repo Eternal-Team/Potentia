@@ -11,6 +11,7 @@ namespace Potentia.Items
 		public override void SetStaticDefaults()
 		{
 			DisplayName.SetDefault("Wrench");
+			Tooltip.SetDefault("Used for modifying cables");
 		}
 
 		public override void SetDefaults()
