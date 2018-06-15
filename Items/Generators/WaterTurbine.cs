@@ -1,7 +1,7 @@
 ﻿using TheOneLibrary.Base;
 using TheOneLibrary.Base.Items;
 
-namespace Potentia.Items.Generators
+namespace PotentiaCore.Items.Generators
 {
 	[EnergyTile]
 	public class WaterTurbine : BaseItem

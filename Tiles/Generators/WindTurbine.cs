@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Potentia.TileEntities.Generators;
+using PotentiaCore.TileEntities.Generators;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
@@ -8,11 +8,11 @@ using Terraria.ObjectData;
 using TheOneLibrary.Base;
 using TheOneLibrary.Utils;
 
-namespace Potentia.Tiles.Generators
+namespace PotentiaCore.Tiles.Generators
 {
 	public class WindTurbine : BaseTile
 	{
-		public override string Texture => Potentia.Textures.TilePath + "WindTurbine";
+		public override string Texture => PotentiaCore.Textures.TilePath + "WindTurbine";
 
 		public override void SetDefaults()
 		{
@@ -47,7 +47,7 @@ namespace Potentia.Tiles.Generators
 			}
 			return 0;
 		}
-		
+
 		public override void RightClick(int i, int j)
 		{
 			TEWindTurbine panel = mod.GetTileEntity<TEWindTurbine>(i, j);
@@ -56,10 +56,15 @@ namespace Potentia.Tiles.Generators
 
 		public override void KillMultiTile(int i, int j, int frameX, int frameY)
 		{
-			TEWindTurbine panel = mod.GetTileEntity<TEWindTurbine>(i, j);
-			panel?.CloseUI();
+			TEWindTurbine turbine = mod.GetTileEntity<TEWindTurbine>(i, j);
+			if (turbine == null) return;
 
-			Item.NewItem(i * 16, j * 16, 48, 96, mod.ItemType<Items.Generators.WindTurbine>());
+			turbine.CloseUI();
+
+			int index = Item.NewItem(i * 16, j * 16, 16, 96, mod.ItemType<Items.Generators.WindTurbine>());
+
+			if (turbine.GetEnergy() > 0)	((Items.Generators.WindTurbine)Main.item[index].modItem).energy = turbine.energy.GetEnergy();
+
 			mod.GetTileEntity<TEWindTurbine>().Kill(i, j);
 		}
 	}

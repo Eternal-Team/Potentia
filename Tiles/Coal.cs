@@ -3,11 +3,11 @@ using Terraria;
 using Terraria.ModLoader;
 using TheOneLibrary.Base;
 
-namespace Potentia.Tiles
+namespace PotentiaCore.Tiles
 {
 	public class Coal : BaseTile
 	{
-		public override string Texture => Potentia.Textures.TilePath + "Coal";
+		public override string Texture => PotentiaCore.Textures.TilePath + "Coal";
 
 		public override void SetDefaults()
 		{

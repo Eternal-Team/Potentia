@@ -7,8 +7,8 @@
     <ProjectGuid>{1A626AD3-1AA3-4FAA-96CE-03746AE6E8D9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Potentia</RootNamespace>
-    <AssemblyName>Potentia</AssemblyName>
+    <RootNamespace>PotentiaCore</RootNamespace>
+    <AssemblyName>PotentiaCore</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -48,21 +48,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Global\Net.cs" />
-    <Compile Include="Grid\CableSerializer.cs" />
-    <Compile Include="Grid\IO.cs" />
-    <Compile Include="Items\Cables\BaseCable.cs" />
-    <Compile Include="Items\Cables\BasicCable.cs" />
-    <Compile Include="Grid\CableLayer.cs" />
-    <Compile Include="Grid\Cable.cs" />
-    <Compile Include="Grid\CableGrid.cs" />
     <Compile Include="Global\PWorld.cs" />
     <Compile Include="Items\Coal.cs" />
     <Compile Include="Items\Generators\WindTurbine.cs" />
     <Compile Include="Items\Generators\WaterTurbine.cs" />
     <Compile Include="Items\Generators\SolarPanel.cs" />
     <Compile Include="Items\WaterPump.cs" />
-    <Compile Include="Items\Wrench.cs" />
-    <Compile Include="Potentia.cs" />
+    <Compile Include="PotentiaCore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TileEntities\Generators\TESolarPanel.cs" />
     <Compile Include="TileEntities\Generators\TEWaterTurbine.cs" />
@@ -80,8 +72,6 @@
   <ItemGroup>
     <Content Include="build.txt" />
     <Content Include="description.txt" />
-    <Content Include="Textures\CableGrid\BasicWire.png" />
-    <Content Include="Textures\CableGrid\Connections.png" />
     <Content Include="Textures\Tiles\Coal.png" />
   </ItemGroup>
   <ItemGroup>

@@ -4,9 +4,8 @@ using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Potentia.Grid;
-using Potentia.TileEntities.Generators;
-using Potentia.Tiles;
+using PotentiaCore.TileEntities.Generators;
+using PotentiaCore.Tiles;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.Generation;
@@ -15,7 +14,7 @@ using Terraria.ModLoader.IO;
 using Terraria.World.Generation;
 using TheOneLibrary.Utils;
 
-namespace Potentia.Global
+namespace PotentiaCore.Global
 {
 	public class PWorld : ModWorld
 	{
@@ -23,8 +22,6 @@ namespace Potentia.Global
 
 		public int[,] oil;
 		public int[,] gas;
-
-		public CableLayer layer = new CableLayer();
 
 		public float RandomWeighted(float min, float max, float cap, int percent) => Main.rand.Next(0, 101) > percent ? Main.rand.NextFloat(min, cap) : Main.rand.NextFloat(cap, max);
 
@@ -39,7 +36,7 @@ namespace Potentia.Global
 			int ShiniesIndex = tasks.FindIndex(genpass => genpass.Name.Equals("Shinies"));
 			if (ShiniesIndex != -1)
 			{
-				tasks.Insert(ShiniesIndex, new PassLegacy("Potentia:FossilisedFuels", progress =>
+				tasks.Insert(ShiniesIndex, new PassLegacy("PotentiaCore:FossilisedFuels", progress =>
 				{
 					progress.Message = "Fossilising dinosaurs";
 
@@ -76,11 +73,6 @@ namespace Potentia.Global
 		}
 		#endregion
 
-		public override void PreUpdate()
-		{
-			layer.Update();
-		}
-
 		public float angle;
 
 		public override void PostDrawTiles()
@@ -94,15 +86,13 @@ namespace Potentia.Global
 
 				Color color = Lighting.GetColor(kvp.Key.X, kvp.Key.Y);
 
-				Main.spriteBatch.Draw(Potentia.Textures.turbineBladeTexture, position, null, color, MathHelper.ToRadians(angle), new Vector2(6, 42), Vector2.One, SpriteEffects.None, 0f);
-				Main.spriteBatch.Draw(Potentia.Textures.turbineBladeTexture, position, null, color, MathHelper.ToRadians(angle + 120f), new Vector2(6, 42), Vector2.One, SpriteEffects.None, 0f);
-				Main.spriteBatch.Draw(Potentia.Textures.turbineBladeTexture, position, null, color, MathHelper.ToRadians(angle + 240f), new Vector2(6, 42), Vector2.One, SpriteEffects.None, 0f);
+				Main.spriteBatch.Draw(PotentiaCore.Textures.turbineBladeTexture, position, null, color, MathHelper.ToRadians(angle), new Vector2(6, 42), Vector2.One, SpriteEffects.None, 0f);
+				Main.spriteBatch.Draw(PotentiaCore.Textures.turbineBladeTexture, position, null, color, MathHelper.ToRadians(angle + 120f), new Vector2(6, 42), Vector2.One, SpriteEffects.None, 0f);
+				Main.spriteBatch.Draw(PotentiaCore.Textures.turbineBladeTexture, position, null, color, MathHelper.ToRadians(angle + 240f), new Vector2(6, 42), Vector2.One, SpriteEffects.None, 0f);
 
 				angle += Math.Abs(Main.windSpeed * 15f);
 				if (angle > 360f) angle = 0;
 			}
-
-			layer.Draw(Main.spriteBatch);
 
 			Main.spriteBatch.End();
 		}
@@ -113,7 +103,6 @@ namespace Potentia.Global
 			["Height"] = oil.GetLength(1),
 			["DataOil"] = oil.Cast<int>().ToList(),
 			["DataGas"] = gas.Cast<int>().ToList(),
-			["Layer"] = layer.Save()
 		};
 
 		public override void Load(TagCompound tag)
@@ -123,8 +112,6 @@ namespace Potentia.Global
 
 			oil = tag.GetList<int>("DataOil").To2DArray(width, height);
 			gas = tag.GetList<int>("DataGas").To2DArray(width, height);
-
-			layer.Load(tag.GetList<TagCompound>("Layer").ToList());
 		}
 
 		public override void NetSend(BinaryWriter writer)

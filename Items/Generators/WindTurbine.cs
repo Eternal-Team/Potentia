@@ -1,11 +1,24 @@
-﻿using TheOneLibrary.Base;
+﻿using Terraria;
+using Terraria.ModLoader;
+using TheOneLibrary.Base;
 using TheOneLibrary.Base.Items;
 
-namespace Potentia.Items.Generators
+namespace PotentiaCore.Items.Generators
 {
 	[EnergyTile]
 	public class WindTurbine : BaseItem
 	{
+		public override bool CloneNewInstances => true;
+
+		public long energy;
+
+		public override ModItem Clone(Item item)
+		{
+			WindTurbine clone = (WindTurbine)base.Clone(item);
+			clone.energy = energy;
+			return clone;
+		}
+
 		public override void SetStaticDefaults()
 		{
 			DisplayName.SetDefault("Wind Turbine");

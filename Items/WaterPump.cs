@@ -1,7 +1,7 @@
 ﻿using TheOneLibrary.Base;
 using TheOneLibrary.Base.Items;
 
-namespace Potentia.Items
+namespace PotentiaCore.Items
 {
 	[EnergyTile]
 	public class WaterPump : BaseItem

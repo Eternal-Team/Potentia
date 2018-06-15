@@ -1,4 +1,4 @@
-﻿using Potentia.TileEntities.Generators;
+﻿using PotentiaCore.TileEntities.Generators;
 using Terraria;
 using Terraria.ModLoader;
 using TheOneLibrary.Base.UI;
@@ -6,7 +6,7 @@ using TheOneLibrary.Base.UI.Elements;
 using TheOneLibrary.UI.Elements;
 using TheOneLibrary.Utils;
 
-namespace Potentia.UI.Generators
+namespace PotentiaCore.UI.Generators
 {
 	public class WaterTurbineUI : BaseUI, ITileEntityUI
 	{

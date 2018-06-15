@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Potentia.TileEntities.Generators;
+using PotentiaCore.TileEntities.Generators;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
@@ -8,7 +8,7 @@ using Terraria.ObjectData;
 using TheOneLibrary.Base;
 using TheOneLibrary.Utils;
 
-namespace Potentia.Tiles.Generators
+namespace PotentiaCore.Tiles.Generators
 {
 	public class WaterTurbine : BaseTile
 	{

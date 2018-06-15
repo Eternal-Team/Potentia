@@ -1,5 +1,5 @@
-﻿using Potentia.Tiles.Generators;
-using Potentia.UI.Generators;
+﻿using PotentiaCore.Tiles.Generators;
+using PotentiaCore.UI.Generators;
 using Terraria;
 using Terraria.ID;
 using TheOneLibrary.Base;
@@ -7,7 +7,7 @@ using TheOneLibrary.Base.UI;
 using TheOneLibrary.Energy.Energy;
 using TheOneLibrary.Utils;
 
-namespace Potentia.TileEntities.Generators
+namespace PotentiaCore.TileEntities.Generators
 {
 	public class TESolarPanel : BaseTE, IEnergyProvider
 	{

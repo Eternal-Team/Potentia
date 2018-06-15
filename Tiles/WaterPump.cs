@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Potentia.TileEntities;
+using PotentiaCore.TileEntities;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
@@ -7,7 +7,7 @@ using Terraria.ObjectData;
 using TheOneLibrary.Base;
 using TheOneLibrary.Utils;
 
-namespace Potentia.Tiles
+namespace PotentiaCore.Tiles
 {
 	public class WaterPump : BaseTile
 	{

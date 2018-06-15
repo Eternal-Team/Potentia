@@ -2,8 +2,7 @@
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Potentia.Global;
-using Potentia.Grid;
+using PotentiaCore.Global;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.UI;
@@ -11,30 +10,25 @@ using TheOneLibrary.Base;
 using TheOneLibrary.Base.UI;
 using TheOneLibrary.Utils;
 
-namespace Potentia
+namespace PotentiaCore
 {
-	public class Potentia : Mod
+	public class PotentiaCore : Mod
 	{
 		public struct Textures
 		{
-			public const string Path = "Potentia/Textures/";
+			public const string Path = "PotentiaCore/Textures/";
 			public const string TilePath = Path + "Tiles/";
 
-			[Texture(Path + "CableGrid/BasicWire")] public static Texture2D cableTexture;
-			[Texture(Path + "CableGrid/Connections")] public static Texture2D cableIOTexture;
 			[Texture(TilePath + "WindTurbineBlade")] public static Texture2D turbineBladeTexture;
 		}
 
-		public static Potentia Instance;
-		public static CableSerializer serializer = new CableSerializer();
+		public static PotentiaCore Instance;
 
 		public GUIs UIs = new GUIs("Vanilla: Hotbar");
 
 		public override void Load()
 		{
 			Instance = this;
-
-			TagSerializer.AddSerializer(serializer);
 
 			Utility.LoadTextures();
 		}

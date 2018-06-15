@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Potentia.Tiles;
+using PotentiaCore.Tiles;
 using Terraria;
 using Terraria.ID;
 using TheOneLibrary.Base;
@@ -9,7 +9,7 @@ using TheOneLibrary.Fluid.VanillaFluids;
 using TheOneLibrary.Storage;
 using TheOneLibrary.Utils;
 
-namespace Potentia.TileEntities
+namespace PotentiaCore.TileEntities
 {
 	public class TEWaterPump : BaseTE, IFluidContainer
 	{

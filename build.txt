@@ -1,6 +1,6 @@
 ﻿author = Eternal Team
 version = 0.1
-displayName = Potentia
+displayName = Potentia Core
 homepage = http://forums.terraria.org/index.php?threads/itorius-mods.42289/
 hideCode = false
 hideResources = false

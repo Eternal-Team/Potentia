@@ -1,7 +1,7 @@
 ﻿using Terraria.ID;
 using TheOneLibrary.Base.Items;
 
-namespace Potentia.Items
+namespace PotentiaCore.Items
 {
 	public class Coal : BaseItem
 	{
